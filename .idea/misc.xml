@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_shape_rounded.xml" value="0.23489583333333333" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/map_shape_rounded.xml" value="0.23489583333333333" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/activity_main.xml" value="0.2821557971014493" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/item_note.xml" value="0.21875" />
       </map>
     </option>
   </component>

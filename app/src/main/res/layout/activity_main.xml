@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.MainActivity"
+    android:background="#EAE8DC">
 
     <LinearLayout
 
@@ -16,14 +17,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+            <fragment
                 android:id="@+id/map"
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="300dp"
@@ -34,13 +35,20 @@
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <Button
+                android:id="@+id/btnAddNote"
                 android:layout_width="85dp"
                 android:layout_height="match_parent"
+                android:backgroundTint="#0e3746"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/map"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="ADD"/>
+                android:text="@string/btn_add_text"
+                android:textColor="#BE2623"
+                android:textStyle="bold"
+                android:textSize="25sp">
+
+            </Button>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,7 +83,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="No records available yet :( \n Add something with the ADD Button"
+            android:text="@string/no_records_available_yet"
             android:textSize="16sp"
             android:visibility="visible"
             tools:visibility="visible"/>

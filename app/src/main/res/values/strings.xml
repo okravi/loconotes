@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">loconotes</string>
+    <string name="no_records_available_yet">No records available yet :( \n Add something with the ADD Button</string>
+    <string name="btn_add_text">A\nD\nD</string>
 </resources>

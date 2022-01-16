@@ -2,12 +2,15 @@ package com.okravi.loconotes.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -15,6 +18,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.PlaceLikelihood
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -22,10 +29,11 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.R
+import java.util.*
 
 private var binding : ActivityMainBinding? = null
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
     //GoogleMaps class for map manipulation
     private lateinit var mMap: GoogleMap
     // FusedLocationProviderClient - Main class for receiving location updates.
@@ -41,26 +49,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, getString(R.string.google_maps_key), Locale.US);
+        }
+
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
         mapFragment!!.getMapAsync(this)
 
         checkLocationPermissionsWithDexter()
 
-
-
-
-
+        binding?.btnAddNote?.setOnClickListener(this)
 
 
     }
 
     //Checking whether user granted the location permissions
-
     private fun checkLocationPermissionsWithDexter(){
         Dexter.withActivity(this).withPermissions(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
         ).withListener(object: MultiplePermissionsListener{
+
             override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                 Toast.makeText(this@MainActivity, "Location permissions granted", Toast.LENGTH_SHORT).show()
                 getFusedUserLocation()
@@ -69,11 +78,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onPermissionRationaleShouldBeShown(
                 permissions: MutableList<PermissionRequest>?,
                 token: PermissionToken?
-            ) {
+            ){
                 //TODO implement intent and show the rationale dialog
                 Toast.makeText(this@MainActivity, "WE HAVE A PROBLEM with LOCATION permissions", Toast.LENGTH_SHORT).show()
             }
-
         }).onSameThread().check()
     }
 
@@ -128,10 +136,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 initiallyZoomedIn = true
                 mMap.animateCamera(newLatLngZoom)
             }
-
-
-
-
         }
     }
 
@@ -150,6 +154,44 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         //getCurrentLocation()
     }
 
+    @SuppressLint("MissingPermission")
+    private fun getListOfLocationsForCurrentPosition(){
+        //Client that exposes the Places API methods
+        var placesClient = Places.createClient(this)
+        // Use fields to define the data types to return.
+        val placeFields: List<Place.Field> = listOf(Place.Field.NAME)
+        // Use the builder to create a FindCurrentPlaceRequest.
+        val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
+
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+            val placeResponse = placesClient.findCurrentPlace(request)
+            placeResponse.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val response = task.result
+                    for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
+                        Log.e(
+                            "debug",
+                            "Place '${placeLikelihood.place.name}' has likelihood: ${placeLikelihood.likelihood}"
+                        )
+                    }
+                } else {
+                    val exception = task.exception
+                    if (exception is ApiException) {
+                        Log.e("debug", "Place not found: ${exception.statusCode}")
+                    }
+                }
+            }
+    }
+
+    override fun onClick(v: View?) {
+        when (v!!.id) {
+            binding?.btnAddNote?.id -> {
+                Log.e("debug", "Add button clicked")
+                getListOfLocationsForCurrentPosition()
+            }
+
+        }
+    }
     override fun onDestroy() {
         super.onDestroy()
         binding = null

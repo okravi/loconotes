@@ -2,14 +2,20 @@ package com.okravi.loconotes.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -17,7 +23,6 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.PlaceLikelihood
@@ -27,8 +32,8 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.R
+import com.okravi.loconotes.databinding.ActivityMainBinding
 import java.util.*
 
 private var binding : ActivityMainBinding? = null
@@ -49,40 +54,91 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        checkLocationPermissionsWithDexter()
+
+        //Initializing Places
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, getString(R.string.google_maps_key), Locale.US);
         }
 
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        val mapFragment =
+            supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
         mapFragment!!.getMapAsync(this)
 
-        checkLocationPermissionsWithDexter()
-
         binding?.btnAddNote?.setOnClickListener(this)
+    }
 
-
+    //Checking if location permissions are granted
+    private fun isLocationEnabled(): Boolean {
+        return !(ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED)
     }
 
     //Checking whether user granted the location permissions
-    private fun checkLocationPermissionsWithDexter(){
-        Dexter.withActivity(this).withPermissions(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ).withListener(object: MultiplePermissionsListener{
+    private fun checkLocationPermissionsWithDexter() {
 
-            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                Toast.makeText(this@MainActivity, "Location permissions granted", Toast.LENGTH_SHORT).show()
-                getFusedUserLocation()
-            }
+        if (!isLocationEnabled()) {
+            Log.e("debug", "checkLocationPermissionsWithDexter/permissions enabled: false")
+            Toast.makeText(
+                this,
+                "Your location provider is turned off. Please turn it on.",
+                Toast.LENGTH_SHORT
+            ).show()
 
-            override fun onPermissionRationaleShouldBeShown(
-                permissions: MutableList<PermissionRequest>?,
-                token: PermissionToken?
-            ){
-                //TODO implement intent and show the rationale dialog
-                Toast.makeText(this@MainActivity, "WE HAVE A PROBLEM with LOCATION permissions", Toast.LENGTH_SHORT).show()
+            // This will redirect you to settings from where you need to turn on the location provider.
+            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            startActivity(intent)
+        } else {
+
+            Log.e("debug", "checking permissions with Dexter")
+            Dexter.withActivity(this).withPermissions(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ).withListener(object : MultiplePermissionsListener {
+
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    Log.e("debug", "Dexter checked the permissions and they are fine")
+
+                    getFusedUserLocation()
+                }
+
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: MutableList<PermissionRequest>?,
+                    token: PermissionToken?
+                ) {
+                    Log.e("debug", "we should show the rationale")
+                    showRationaleDialogForPermissions()
+                }
+            }).onSameThread().check()
+            Log.e("debug", "we're in the end of checkLocationPermissionsWithDexter")
+        }
+    }
+
+    private fun showRationaleDialogForPermissions() {
+        AlertDialog.Builder(this)
+            .setMessage("It looks like the permissions weren't granted. That's unfortunate.")
+            .setPositiveButton("GO TO SETTINGS")
+            { _, _ ->
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
             }
-        }).onSameThread().check()
+            .setNegativeButton("Cancel") { dialog,
+                                           _ ->
+                dialog.dismiss()
+            }.show()
+        Log.e("debug", "the user could've granted the access by now")
+
     }
 
     //Getting user location, we've already checked the permissions with Dexter
@@ -94,17 +150,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         locationRequest = LocationRequest().apply {
             // Sets the desired interval for
             // active location updates.
-            // This interval is inexact.
             interval = 60000
 
             // Sets the fastest rate for active location updates.
-            // This interval is exact, and your application will never
-            // receive updates more frequently than this value
-            fastestInterval = 1000
+            fastestInterval = 2000
 
             // Sets the maximum time when batched location
-            // updates are delivered. Updates may be
-            // delivered sooner than this interval
+            // updates are delivered.
             maxWaitTime = 500
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -112,12 +164,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallBack,
             Looper.myLooper()!!
         )
-
+        Log.e("debug", "we're in the end of GetFusedLocation")
     }
+
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
-
-        var initiallyZoomedIn: Boolean = false
+        //Zooming in only upon the app's start
+        var alreadyZoomedIn: Boolean = false
 
         override fun onLocationResult(locationResult: LocationResult){
             //val mLastLocation: Location = locationResult.lastLocation
@@ -128,32 +181,33 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             Log.i("Longitude", "$mLongitude")
 
             //Zooming in on user's location
-
             val position = LatLng(mLatitude, mLongitude)
+            if (!alreadyZoomedIn){
 
-            if (!initiallyZoomedIn){
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
-                initiallyZoomedIn = true
+                alreadyZoomedIn = true
                 mMap.animateCamera(newLatLngZoom)
             }
         }
     }
 
 
-//Displaying users location on map. We've already checked the permissions with Dexter.
+    //Displaying users location on the map. Checking permissions with isLocationEnabled()
+    //@SuppressLint("MissingPermission")
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.e("debug", "onMapReady")
-        mMap = googleMap
 
-        mMap.isMyLocationEnabled = true
-        mMap.uiSettings.isMyLocationButtonEnabled = true
-        mMap.uiSettings.isZoomControlsEnabled = false
+        if (isLocationEnabled()) {
 
-
-        //getCurrentLocation()
+            mMap = googleMap
+            mMap.isMyLocationEnabled = true
+            mMap.uiSettings.isMyLocationButtonEnabled = true
+            mMap.uiSettings.isZoomControlsEnabled = false
+        }
     }
 
+    //Getting a list of locations closest to the user's current location. Checking permissions
+    //in the onClick function
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(){
         //Client that exposes the Places API methods
@@ -187,11 +241,31 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
                 Log.e("debug", "Add button clicked")
-                getListOfLocationsForCurrentPosition()
-            }
 
+                if(isLocationEnabled()) {
+                    getListOfLocationsForCurrentPosition()
+                }else{
+                    Toast.makeText(this, "Please grant the location permission!", Toast.LENGTH_SHORT).show()
+                }
+
+            }
         }
     }
+
+    //Making sure the location gets displayed on the map if user gives back the location permissions
+    override fun onStart() {
+        super.onStart()
+        Log.e("debug", "We're back in the game!")
+
+        if(isLocationEnabled()){
+
+            getFusedUserLocation()
+            val mapFragment =
+                supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+            mapFragment!!.getMapAsync(this)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         binding = null

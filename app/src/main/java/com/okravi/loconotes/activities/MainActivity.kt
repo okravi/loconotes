@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         //Initializing Places
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, getString(R.string.google_maps_key), Locale.US);
+            Places.initialize(applicationContext, getString(R.string.google_maps_key), Locale.US)
         }
 
         val mapFragment =
@@ -213,19 +213,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         //Client that exposes the Places API methods
         var placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
-        val placeFields: List<Place.Field> = listOf(Place.Field.NAME)
+        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
+        val placeFieldsLatLng: List<Place.Field> = listOf(Place.Field.LAT_LNG)
         // Use the builder to create a FindCurrentPlaceRequest.
-        val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
+        val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
 
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-            val placeResponse = placesClient.findCurrentPlace(request)
+            val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
                         Log.e(
                             "debug",
-                            "Place '${placeLikelihood.place.name}' has likelihood: ${placeLikelihood.likelihood}"
+                            "Place '${placeLikelihood.place.name}' " +
+                                    "has likelihood: ${placeLikelihood.likelihood} " +
+                                    "and is located at ${placeLikelihood.place.latLng}" +
+                                    " ${placeLikelihood.place.id}" +
+                                    "${placeLikelihood.place.address}" +
+                                    "${placeLikelihood.place.photoMetadatas}"
                         )
                     }
                 } else {

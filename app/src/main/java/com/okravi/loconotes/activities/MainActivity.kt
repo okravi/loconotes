@@ -34,6 +34,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.okravi.loconotes.R
 import com.okravi.loconotes.databinding.ActivityMainBinding
+import com.okravi.loconotes.models.LocationNoteModel
 import java.util.*
 
 private var binding : ActivityMainBinding? = null
@@ -210,6 +211,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //in the onClick function
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(){
+        var cycleCounter = 0
         //Client that exposes the Places API methods
         var placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
@@ -222,17 +224,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+
+                    public val listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
+
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
-                        Log.e(
-                            "debug",
-                            "Place '${placeLikelihood.place.name}' " +
-                                    "has likelihood: ${placeLikelihood.likelihood} " +
-                                    "and is located at ${placeLikelihood.place.latLng}" +
-                                    " ${placeLikelihood.place.id}" +
-                                    "${placeLikelihood.place.address}" +
-                                    "${placeLikelihood.place.photoMetadatas}"
-                        )
+
+                        //Saving 5 top probability places to the list
+                        if (cycleCounter<=4){
+                            Log.e("debug", "we're in cycle")
+                            var nearbyLocation : LocationNoteModel = LocationNoteModel()
+                            nearbyLocation.googlePlaceID = placeLikelihood.place.id.toString()
+                            nearbyLocation.placeName = placeLikelihood.place.name
+                            nearbyLocation.placeLatitude = placeLikelihood.place.latLng.latitude.toString()
+                            nearbyLocation.placeLongitude = placeLikelihood.place.latLng.longitude.toString()
+                            nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
+                            cycleCounter += 1
+                            if (nearbyLocation.googlePlaceID != "") {
+                                listOfNearbyPlaces.add(nearbyLocation)
+                            }
+                        }
+
+                        Log.e("debug", "Nearby places list size is: ${listOfNearbyPlaces.size}")
+
                     }
                 } else {
                     val exception = task.exception

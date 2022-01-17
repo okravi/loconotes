@@ -22,7 +22,7 @@ class NearbyPlacesAdapter(
             LayoutInflater.from(parent.context), parent, false))
     }
 
-    //binding each item to a view
+    //binding every item to a view
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = items[position]
 

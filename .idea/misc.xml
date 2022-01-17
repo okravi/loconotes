@@ -5,8 +5,9 @@
       <map>
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/button_add_test.xml" value="0.39692307692307693" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_shape_rounded.xml" value="0.23489583333333333" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/ic_outline_note_add_24.xml" value="0.39692307692307693" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/map_shape_rounded.xml" value="0.23489583333333333" />
-        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/activity_main.xml" value="0.2821557971014493" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/fragment_maps.xml" value="0.21614583333333334" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/item_nearby_place.xml" value="0.21875" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/layout/item_note.xml" value="0.21875" />

@@ -10,5 +10,6 @@ data class LocationNoteModel(
     var placeLikelyHood: Double = 0.0,
     var dateNoteLastModified: String = "",
     var textNote: String = "",
+    var isSelected: Boolean = false
 
-): Serializable
+    ): Serializable

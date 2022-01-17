@@ -28,7 +28,7 @@
                 android:layout_weight="3.8"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
-                android:background="@drawable/button_add_test"
+
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="3dp"
@@ -40,18 +40,20 @@
 
                 <fragment
                     android:id="@+id/map_fragment"
+                    android:background="@drawable/outlined_background"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>
 
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddNote"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/button_add_test"
+                android:background="@drawable/outlined_background"
+                
                 app:backgroundTint="#0e3746"
                 android:layout_marginStart="3dp"
                 android:layout_marginEnd="5dp"
@@ -65,7 +67,7 @@
 
                 app:layout_constraintVertical_bias="0.0">
 
-            </Button>
+            </com.google.android.material.button.MaterialButton>
 
 
 
@@ -105,13 +107,14 @@
             android:id="@+id/tv_no_records_available"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/button_add_test"
+            android:background="@drawable/outlined_background"
             android:gravity="center"
             android:text="@string/no_records_available_yet"
             android:textSize="16sp"
             android:layout_marginBottom="10dp"
             android:visibility="visible"
-            tools:visibility="visible"/>
+            tools:visibility="visible"
+             />
 
     </LinearLayout>
 

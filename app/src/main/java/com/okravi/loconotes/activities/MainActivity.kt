@@ -67,6 +67,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         mapFragment!!.getMapAsync(this)
 
         binding?.btnAddNote?.setOnClickListener(this)
+        binding?.btnAddNote?.translationX = -150F
+
+        binding?.btnAddNote?.
+        animate()?.alpha(1f)?.translationXBy(150F)?.setStartDelay(50)?.duration = 2000
     }
 
     //Checking if location permissions are granted

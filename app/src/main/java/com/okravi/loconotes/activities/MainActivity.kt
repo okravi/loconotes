@@ -176,9 +176,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         override fun onLocationResult(locationResult: LocationResult){
             //val mLastLocation: Location = locationResult.lastLocation
             currentLocation = locationResult.lastLocation
-            var mLatitude = currentLocation!!.latitude
+            val mLatitude = currentLocation!!.latitude
             Log.i("Latitude", "$mLatitude")
-            var mLongitude = currentLocation!!.longitude
+            val mLongitude = currentLocation!!.longitude
             Log.i("Longitude", "$mLongitude")
 
             //Zooming in on user's location
@@ -210,13 +210,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Getting a list of locations closest to the user's current location. Checking permissions
     //in the onClick function
     @SuppressLint("MissingPermission")
-    private fun getListOfLocationsForCurrentPosition(){
+    private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
         var cycleCounter = 0
+        val listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
         //Client that exposes the Places API methods
-        var placesClient = Places.createClient(this)
+        val placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
         val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
-        val placeFieldsLatLng: List<Place.Field> = listOf(Place.Field.LAT_LNG)
+
         // Use the builder to create a FindCurrentPlaceRequest.
         val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
 
@@ -225,19 +226,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
 
-                    public val listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
-
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
                         //Saving 5 top probability places to the list
                         if (cycleCounter<=4){
                             Log.e("debug", "we're in cycle")
-                            var nearbyLocation : LocationNoteModel = LocationNoteModel()
-                            nearbyLocation.googlePlaceID = placeLikelihood.place.id.toString()
-                            nearbyLocation.placeName = placeLikelihood.place.name
-                            nearbyLocation.placeLatitude = placeLikelihood.place.latLng.latitude.toString()
-                            nearbyLocation.placeLongitude = placeLikelihood.place.latLng.longitude.toString()
+                            val nearbyLocation = LocationNoteModel()
+                            nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
+                            nearbyLocation.placeName = placeLikelihood.place.name!!
+                            nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!.latitude.toString()
+                            nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!.longitude.toString()
                             nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
                             cycleCounter += 1
                             if (nearbyLocation.googlePlaceID != "") {
@@ -248,13 +247,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         Log.e("debug", "Nearby places list size is: ${listOfNearbyPlaces.size}")
 
                     }
+
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
                         Log.e("debug", "Place not found: ${exception.statusCode}")
                     }
                 }
+
             }
+        return listOfNearbyPlaces
     }
 
     override fun onClick(v: View?) {

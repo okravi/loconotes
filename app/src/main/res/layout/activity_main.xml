@@ -53,7 +53,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/outlined_background"
-                
+
                 app:backgroundTint="#0e3746"
                 android:layout_marginStart="3dp"
                 android:layout_marginEnd="5dp"
@@ -90,18 +90,18 @@
 
         android:orientation="vertical">
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+
+
+
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_happy_places_list"
+                android:id="@+id/rv_nearby_places_list"
+                android:background="@color/white"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                tools:visibility="gone"/>
+                android:layout_height="match_parent"
+                />
 
-        </ScrollView>
+
 
         <TextView
             android:id="@+id/tv_no_records_available"
@@ -112,8 +112,8 @@
             android:text="@string/no_records_available_yet"
             android:textSize="16sp"
             android:layout_marginBottom="10dp"
-            android:visibility="visible"
-            tools:visibility="visible"
+            android:visibility="gone"
+            tools:visibility="gone"
              />
 
     </LinearLayout>

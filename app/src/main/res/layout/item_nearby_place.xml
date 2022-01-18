@@ -27,22 +27,16 @@
             android:padding="8dp">
 
 
-            <LinearLayout
+
+
+            <TextView
+                android:id="@+id/tvNearbyPlaceName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:orientation="vertical">
-
-
-                <TextView
-                    android:id="@+id/tvNearbyPlaceName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
-                    tools:text="Nearby place name" />
-            </LinearLayout>
+                android:background="#545454"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                tools:text="Nearby place name" />
 
         </LinearLayout>
 

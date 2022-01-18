@@ -16,6 +16,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -33,6 +36,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.okravi.loconotes.R
+import com.okravi.loconotes.adapters.NearbyPlacesAdapter
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import java.util.*
@@ -67,11 +71,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         mapFragment!!.getMapAsync(this)
 
         binding?.btnAddNote?.setOnClickListener(this)
-        binding?.btnAddNote?.translationX = -150F
 
+        binding?.btnAddNote?.translationX = -150F
+        //animating the Add button
         binding?.btnAddNote?.
         animate()?.alpha(1f)?.translationXBy(150F)?.setStartDelay(50)?.duration = 2000
     }
+
+
 
     //Checking if location permissions are granted
     private fun isLocationEnabled(): Boolean {
@@ -216,7 +223,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
         var cycleCounter = 0
-        val listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
+        var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
         //Client that exposes the Places API methods
         val placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
@@ -234,7 +241,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
                         //Saving 5 top probability places to the list
-                        if (cycleCounter<=4){
+                        if (cycleCounter<4){
                             Log.e("debug", "we're in cycle")
                             val nearbyLocation = LocationNoteModel()
                             nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
@@ -243,9 +250,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                             nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!.longitude.toString()
                             nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
                             cycleCounter += 1
+
                             if (nearbyLocation.googlePlaceID != "") {
                                 listOfNearbyPlaces.add(nearbyLocation)
                             }
+                        }else if(cycleCounter==4){
+                            Log.e("debug", "calling setupNearbyPlacesRecyclerView from ELSE IF with " +
+                                    "${listOfNearbyPlaces.size} places")
+                            setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
+
                         }
 
                         Log.e("debug", "Nearby places list size is: ${listOfNearbyPlaces.size}")
@@ -260,6 +273,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
 
             }
+        Log.e("debug", "Calling setupNearbyPlacesRecyclerView with: ${listOfNearbyPlaces.size} places")
+        //setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
+
+        binding?.tvNoRecordsAvailable?.visibility = View.GONE
+        //binding?.svNearbyPlacesList?.visibility = View.VISIBLE
+
         return listOfNearbyPlaces
     }
 
@@ -270,6 +289,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 if(isLocationEnabled()) {
                     getListOfLocationsForCurrentPosition()
+
                 }else{
                     Toast.makeText(this, "Please grant the location permission!", Toast.LENGTH_SHORT).show()
                 }
@@ -290,6 +310,60 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
             mapFragment!!.getMapAsync(this)
         }
+    }
+
+    private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
+
+
+        Log.e("debug", "we're in setupNearbyPlacesRecyclerView, places number: ${nearbyPlaceList.size}")
+        binding?.rvNearbyPlacesList?.layoutManager = LinearLayoutManager(this@MainActivity)
+        val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
+        binding?.rvNearbyPlacesList?.setHasFixedSize(true)
+        binding?.rvNearbyPlacesList?.adapter = nearbyPlacesAdapter
+
+        binding?.tvNoRecordsAvailable?.visibility = View.GONE
+        Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
+        //binding?.svNearbyPlacesList?.visibility = View.VISIBLE
+    /*
+        placesAdapter.setOnClickListener(object : HappyPlacesAdapter.OnClickListener{
+            override fun onClick(position: Int, model: HappyPlaceModel) {
+                val intent = Intent(this@MainActivity,
+                    HappyPlaceDetailActivity::class.java)
+                intent.putExtra(EXTRA_PLACE_DETAILS, model)
+                startActivity(intent)
+            }
+
+        })
+
+    */
+
+    /*
+        val editSwipeHandler = object :SwipeToEditCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
+                adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, ADD_PLACE_ACTIVITY_REQUEST_CODE)
+            }
+        }
+
+        val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
+        editItemTouchHandler.attachToRecyclerView(rv_happy_places_list)
+
+        val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
+                adapter.removeAt(viewHolder.adapterPosition)
+
+                getHappyPLacesListFromLocalDB()
+            }
+        }
+    */
+
+    /*
+        val deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
+        deleteItemTouchHandler.attachToRecyclerView(rv_happy_places_list)
+
+
+     */
     }
 
     override fun onDestroy() {

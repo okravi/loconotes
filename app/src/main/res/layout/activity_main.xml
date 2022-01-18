@@ -4,124 +4,136 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     tools:context=".activities.MainActivity"
     android:background="#EAE8DC">
 
-    <LinearLayout
-
-        android:id="@+id/llTop"
-        android:layout_height="250dp"
-        android:layout_weight="1"
-        android:layout_width="0dip"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/llBottom"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="5dp"
-        android:orientation="horizontal"
-        >
 
 
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/map_widget"
-                android:layout_weight="3.8"
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
+        <LinearLayout
 
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="3dp"
-                android:layout_marginTop="0dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="12dp"
+            android:id="@+id/llTop"
+            android:layout_height="0dp"
 
-                >
+            android:layout_width="0dip"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/llBottom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
 
-                <fragment
-                    android:id="@+id/map_fragment"
+            app:layout_constraintHeight_percent="0.35"
+
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            >
+
+
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/map_widget"
+                    android:layout_weight="3.8"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginTop="5dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="12dp"
+
+                    >
+
+                    <fragment
+                        android:id="@+id/map_fragment"
+                        android:background="@drawable/outlined_background"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </androidx.cardview.widget.CardView>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddNote"
+                    android:layout_width="0dip"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@drawable/outlined_background"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </androidx.cardview.widget.CardView>
+
+                    app:backgroundTint="#0e3746"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="5dp"
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddNote"
-                android:layout_width="0dip"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/outlined_background"
+                    android:text="@string/btn_add_text"
+                    android:textColor="#0e3746"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
 
-                app:backgroundTint="#0e3746"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="0dp"
+                    app:layout_constraintVertical_bias="0.0">
 
-
-                android:text="@string/btn_add_text"
-                android:textColor="#0e3746"
-                android:textSize="25sp"
-                android:textStyle="bold"
-
-                app:layout_constraintVertical_bias="0.0">
-
-            </com.google.android.material.button.MaterialButton>
+                </com.google.android.material.button.MaterialButton>
 
 
 
-    </LinearLayout>
+        </LinearLayout>
 
-    <LinearLayout
+        <LinearLayout
 
-        android:id="@+id/llBottom"
-        android:layout_height="420dp"
-        android:layout_weight="1"
-        android:layout_width="0dip"
-        app:layout_constraintTop_toBottomOf="@+id/llTop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/outlined_background"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
+            android:id="@+id/llBottom"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_width="0dip"
+            app:layout_constraintTop_toBottomOf="@+id/llTop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
 
-        android:orientation="vertical">
+            app:layout_constraintHeight_percent="0.6"
 
-
-
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_nearby_places_list"
-                android:background="#EAE8DC"
-                android:layout_width="match_parent"
-                android:layout_gravity="center"
-
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginVertical="10dp"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                tools:visibility="gone"
-                android:padding="10dp"
-                />
-
-
-
-        <TextView
-            android:id="@+id/tv_no_records_available"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:gravity="center"
-            android:text="@string/no_records_available_yet"
-            android:textSize="16sp"
+            android:background="@drawable/outlined_background"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
 
-             />
+            android:orientation="vertical">
 
-    </LinearLayout>
+
+
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_nearby_places_list"
+                    android:background="#EAE8DC"
+                    android:layout_width="match_parent"
+                    android:layout_gravity="center"
+
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"
+                    tools:visibility="gone"
+                    android:padding="10dp"
+                    />
+
+
+
+            <TextView
+                android:id="@+id/tv_no_records_available"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:gravity="center"
+                android:text="@string/no_records_available_yet"
+                android:textSize="16sp"
+                android:layout_marginBottom="10dp"
+
+                 />
+
+        </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private lateinit var locationRequest: LocationRequest
     // This will store current location info
     private var currentLocation: Location? = null
+    private val maxNumberOfNearbyPlacesToShowUser = 8
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -241,24 +242,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
                         //Saving 5 top probability places to the list
-                        if (cycleCounter<4){
-                            Log.e("debug", "we're in cycle")
-                            val nearbyLocation = LocationNoteModel()
-                            nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
-                            nearbyLocation.placeName = placeLikelihood.place.name!!
-                            nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!.latitude.toString()
-                            nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!.longitude.toString()
-                            nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
-                            cycleCounter += 1
+                        when {
+                            cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
+                                Log.e("debug", "we're saving places to list one by one")
+                                val nearbyLocation = LocationNoteModel()
+                                nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
+                                nearbyLocation.placeName = placeLikelihood.place.name!!
+                                nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!.latitude.toString()
+                                nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!.longitude.toString()
+                                nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
+                                cycleCounter += 1
 
-                            if (nearbyLocation.googlePlaceID != "") {
-                                listOfNearbyPlaces.add(nearbyLocation)
+                                if (nearbyLocation.googlePlaceID != "") {
+                                    listOfNearbyPlaces.add(nearbyLocation)
+                                }
                             }
-                        }else if(cycleCounter==4){
-                            Log.e("debug", "calling setupNearbyPlacesRecyclerView from ELSE IF with " +
-                                    "${listOfNearbyPlaces.size} places")
-                            setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
+                            ((cycleCounter==maxNumberOfNearbyPlacesToShowUser) ||
+                                    (placeLikelihood.place.id!!.toString() == "")) -> {
+                                Log.e("debug", "calling setupNearbyPlacesRecyclerView " +
+                                        "${listOfNearbyPlaces.size} places")
+                                setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
 
+                            }
                         }
 
                         Log.e("debug", "Nearby places list size is: ${listOfNearbyPlaces.size}")
@@ -322,8 +327,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.rvNearbyPlacesList?.adapter = nearbyPlacesAdapter
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
+        binding?.rvNearbyPlacesList?.visibility = View.VISIBLE
         Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
-        //binding?.svNearbyPlacesList?.visibility = View.VISIBLE
     /*
         placesAdapter.setOnClickListener(object : HappyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: HappyPlaceModel) {

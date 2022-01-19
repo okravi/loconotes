@@ -12,10 +12,12 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.ApiException
@@ -53,6 +55,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     // This will store current location info
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 8
+    var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,13 +75,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.btnAddNote?.setOnClickListener(this)
 
-        binding?.btnAddNote?.translationX = -150F
-        //animating the Add button
+
+        //animating the buttons
+        binding?.btnSettings?.translationX = 250F
+        binding?.btnSettings?.
+        animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(350)?.duration = 2000
+
+        binding?.btnAddNote?.translationX = 250F
         binding?.btnAddNote?.
-        animate()?.alpha(1f)?.translationXBy(150F)?.setStartDelay(50)?.duration = 2000
+        animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(200)?.duration = 2000
+
+        binding?.btnListNotes?.translationX = 250F
+        binding?.btnListNotes?.
+        animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 2000
     }
 
-
+    var listOfSavedNotes = ArrayList<LocationNoteModel>(5)
 
     //Checking if location permissions are granted
     private fun isLocationEnabled(): Boolean {
@@ -223,7 +235,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
         var cycleCounter = 0
-        var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
+        //var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
         //Client that exposes the Places API methods
         val placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
@@ -333,39 +345,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a place", Toast.LENGTH_SHORT).show()
-            }
 
+                val inputEditTextField = EditText(this@MainActivity)
+                val dialog = AlertDialog.Builder(this@MainActivity)
+                    .setTitle("")
+                    .setMessage("Please add a note for: ${listOfNearbyPlaces[position].placeName}")
+                    .setView(inputEditTextField)
+                    .setPositiveButton("OK") { _, _ ->
+                        val newNote = LocationNoteModel()
+                        val editTextInput = inputEditTextField.text.toString()
+                        newNote.textNote = editTextInput
+                        newNote.placeName = listOfNearbyPlaces[position].placeName
+                        newNote.googlePlaceID = listOfNearbyPlaces[position].googlePlaceID
+                        newNote.placeLongitude = listOfNearbyPlaces[position].placeLongitude
+                        newNote.placeLatitude = listOfNearbyPlaces[position].placeLatitude
+                        listOfSavedNotes.add(newNote)
+
+                        Log.d("debug", "Size of listOfSavedNotes:${listOfSavedNotes[listOfSavedNotes.size-1]}, ${editTextInput}")
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                dialog.show()
+            }
         })
 
+        Log.d("debug", "${listOfSavedNotes.size}")
 
-
-    /*
-        val editSwipeHandler = object :SwipeToEditCallback(this){
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
-                adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, ADD_PLACE_ACTIVITY_REQUEST_CODE)
-            }
-        }
-
-        val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
-        editItemTouchHandler.attachToRecyclerView(rv_happy_places_list)
-
-        val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val adapter = rv_happy_places_list.adapter as HappyPlacesAdapter
-                adapter.removeAt(viewHolder.adapterPosition)
-
-                getHappyPLacesListFromLocalDB()
-            }
-        }
-    */
-
-    /*
-        val deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
-        deleteItemTouchHandler.attachToRecyclerView(rv_happy_places_list)
-
-
-     */
     }
 
     override fun onDestroy() {

@@ -8,7 +8,7 @@
     tools:context=".activities.MainActivity"
     android:background="#EAE8DC">
 
-        
+
         <LinearLayout
 
             android:id="@+id/llTop"
@@ -43,28 +43,73 @@
                         android:background="@drawable/outlined_background"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"
+                        />
                 </androidx.cardview.widget.CardView>
 
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddNote"
+                <LinearLayout
+                    android:id="@+id/btnGroup"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:background="@drawable/outlined_background"
-                    app:backgroundTint="#0e3746"
-                    android:layout_marginStart="3dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/btn_add_text"
-                    android:textColor="#0e3746"
-                    android:textSize="25sp"
-                    android:textStyle="bold"
+                    android:orientation="vertical"
+                    >
 
-                    app:layout_constraintVertical_bias="0.0">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSettings"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dip"
+                            android:background="@drawable/outlined_background"
+                            app:backgroundTint="#0e3746"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:text="SET"
+                            android:textColor="#0e3746"
+                            android:textSize="25sp"
+                            android:textStyle="bold"
+                            app:layout_constraintVertical_bias="0.0"
+                            android:layout_weight="1">
+                        </com.google.android.material.button.MaterialButton>
 
-                </com.google.android.material.button.MaterialButton>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAddNote"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dip"
+                            android:background="@drawable/outlined_background"
+                            app:backgroundTint="#0e3746"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:text="@string/btn_add_text"
+                            android:textColor="#0e3746"
+                            android:textSize="25sp"
+                            android:textStyle="bold"
+                            app:layout_constraintVertical_bias="0.0"
+
+                            android:layout_weight="1">
+                        </com.google.android.material.button.MaterialButton>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnListNotes"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dip"
+                            android:background="@drawable/outlined_background"
+                            app:backgroundTint="#0e3746"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:text="NOT"
+                            android:textColor="#0e3746"
+                            android:textSize="25sp"
+                            android:textStyle="bold"
+                            app:layout_constraintVertical_bias="0.0"
+                            android:layout_weight="1">
+                        </com.google.android.material.button.MaterialButton>
+
+
+                </LinearLayout>
+
 
         </LinearLayout>
 
@@ -102,16 +147,16 @@
 
 
 
-            <TextView
-                android:id="@+id/tv_no_records_available"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/no_records_available_yet"
-                android:textSize="16sp"
-                android:textColor="#0e3746"
-                android:layout_marginBottom="10dp"
-                 />
+                <TextView
+                    android:id="@+id/tv_no_records_available"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/no_records_available_yet"
+                    android:textSize="16sp"
+                    android:textColor="#0e3746"
+                    android:layout_marginBottom="10dp"
+                    />
 
         </LinearLayout>
 

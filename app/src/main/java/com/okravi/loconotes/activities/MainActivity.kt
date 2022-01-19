@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.ApiException
@@ -329,18 +328,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvNearbyPlacesList?.visibility = View.VISIBLE
         Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
-    /*
-        placesAdapter.setOnClickListener(object : HappyPlacesAdapter.OnClickListener{
-            override fun onClick(position: Int, model: HappyPlaceModel) {
-                val intent = Intent(this@MainActivity,
-                    HappyPlaceDetailActivity::class.java)
-                intent.putExtra(EXTRA_PLACE_DETAILS, model)
-                startActivity(intent)
+
+
+        nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
+            override fun onClick(position: Int, model: LocationNoteModel) {
+                Toast.makeText(this@MainActivity, "clicked on a place", Toast.LENGTH_SHORT).show()
             }
 
         })
 
-    */
+
 
     /*
         val editSwipeHandler = object :SwipeToEditCallback(this){

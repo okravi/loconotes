@@ -15,7 +15,7 @@ class NearbyPlacesAdapter(
 ):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var onClickRecyclerListener: View.OnClickListener? = null
+    var onClickRecyclerListener: OnClickListener? = null
 
     //inflate items
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -36,14 +36,22 @@ class NearbyPlacesAdapter(
                 if(onClickRecyclerListener != null){
 
                     //TODO: (it) might not be right here
-                    onClickRecyclerListener!!.onClick(it)
+                    onClickRecyclerListener!!.onClick(position, model)
                 }
             }
         }
     }
 
+    fun setOnClickListener(onClickRecyclerListener: OnClickListener){
+        this.onClickRecyclerListener = onClickRecyclerListener
+    }
+
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    interface OnClickListener{
+        fun onClick(position: Int, model: LocationNoteModel)
     }
     //describe item view and metadata about its place within the RecyclerView
     private class MyViewHolder(binding: ItemNearbyPlaceBinding):
@@ -53,3 +61,5 @@ class NearbyPlacesAdapter(
 
     }
 }
+
+

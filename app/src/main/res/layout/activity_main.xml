@@ -8,22 +8,17 @@
     tools:context=".activities.MainActivity"
     android:background="#EAE8DC">
 
-
-
-
+        
         <LinearLayout
 
             android:id="@+id/llTop"
             android:layout_height="0dp"
-
             android:layout_width="0dip"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/llBottom"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintHeight_percent="0.35"
-
             android:layout_margin="5dp"
             android:orientation="horizontal"
             >
@@ -35,14 +30,12 @@
                     android:layout_weight="3.8"
                     android:layout_width="0dip"
                     android:layout_height="match_parent"
-
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="3dp"
                     android:layout_marginTop="5dp"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="12dp"
-
                     >
 
                     <fragment
@@ -60,13 +53,10 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/outlined_background"
-
                     app:backgroundTint="#0e3746"
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="5dp"
                     android:layout_marginTop="5dp"
-
-
                     android:text="@string/btn_add_text"
                     android:textColor="#0e3746"
                     android:textSize="25sp"
@@ -75,8 +65,6 @@
                     app:layout_constraintVertical_bias="0.0">
 
                 </com.google.android.material.button.MaterialButton>
-
-
 
         </LinearLayout>
 
@@ -89,18 +77,13 @@
             app:layout_constraintTop_toBottomOf="@+id/llTop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-
             app:layout_constraintHeight_percent="0.6"
-
             android:background="@drawable/outlined_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-
             android:orientation="vertical">
-
-
 
 
 
@@ -109,7 +92,6 @@
                     android:background="#EAE8DC"
                     android:layout_width="match_parent"
                     android:layout_gravity="center"
-
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginVertical="10dp"
                     android:layout_height="match_parent"
@@ -124,17 +106,13 @@
                 android:id="@+id/tv_no_records_available"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
                 android:gravity="center"
                 android:text="@string/no_records_available_yet"
                 android:textSize="16sp"
                 android:textColor="#0e3746"
                 android:layout_marginBottom="10dp"
-
                  />
 
         </LinearLayout>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

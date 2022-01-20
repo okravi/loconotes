@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.PlaceLikelihood
@@ -108,7 +109,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun checkLocationPermissionsWithDexter() {
 
         if (!isLocationEnabled()) {
-            Log.e("debug", "checkLocationPermissionsWithDexter/permissions enabled: false")
+
             Toast.makeText(
                 this,
                 "Your location provider is turned off. Please turn it on.",
@@ -120,14 +121,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             startActivity(intent)
         } else {
 
-            Log.e("debug", "checking permissions with Dexter")
             Dexter.withActivity(this).withPermissions(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ).withListener(object : MultiplePermissionsListener {
 
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    Log.e("debug", "Dexter checked the permissions and they are fine")
 
                     getFusedUserLocation()
                 }
@@ -136,11 +135,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     permissions: MutableList<PermissionRequest>?,
                     token: PermissionToken?
                 ) {
-                    Log.e("debug", "we should show the rationale")
                     showRationaleDialogForPermissions()
                 }
             }).onSameThread().check()
-            Log.e("debug", "we're in the end of checkLocationPermissionsWithDexter")
+
         }
     }
 
@@ -162,7 +160,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                            _ ->
                 dialog.dismiss()
             }.show()
-        Log.e("debug", "the user could've granted the access by now")
 
     }
 
@@ -189,7 +186,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallBack,
             Looper.myLooper()!!
         )
-        Log.e("debug", "we're in the end of GetFusedLocation")
     }
 
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
@@ -201,10 +197,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             //val mLastLocation: Location = locationResult.lastLocation
             currentLocation = locationResult.lastLocation
             val mLatitude = currentLocation!!.latitude
-            Log.i("Latitude", "$mLatitude")
             val mLongitude = currentLocation!!.longitude
-            Log.i("Longitude", "$mLongitude")
-
             //Zooming in on user's location
             val position = LatLng(mLatitude, mLongitude)
             if (!alreadyZoomedIn){
@@ -256,7 +249,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         //Saving 5 top probability places to the list
                         when {
                             cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
-                                Log.e("debug", "we're saving places to list one by one")
+
                                 val nearbyLocation = LocationNoteModel()
                                 nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
                                 nearbyLocation.placeName = placeLikelihood.place.name!!
@@ -271,31 +264,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                             }
                             ((cycleCounter==maxNumberOfNearbyPlacesToShowUser) ||
                                     (placeLikelihood.place.id!!.toString() == "")) -> {
-                                Log.e("debug", "calling setupNearbyPlacesRecyclerView " +
-                                        "${listOfNearbyPlaces.size} places")
                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
-
                             }
                         }
-
-                        Log.e("debug", "Nearby places list size is: ${listOfNearbyPlaces.size}")
-
                     }
 
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
-                        Log.e("debug", "Place not found: ${exception.statusCode}")
+
                     }
                 }
-
             }
-        Log.e("debug", "Calling setupNearbyPlacesRecyclerView with: ${listOfNearbyPlaces.size} places")
-        //setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
-
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
-        //binding?.svNearbyPlacesList?.visibility = View.VISIBLE
-
         return listOfNearbyPlaces
     }
 
@@ -303,7 +284,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
                 Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show()
-                Log.e("debug", "Add button clicked")
 
                 if(isLocationEnabled()) {
                     getListOfLocationsForCurrentPosition()
@@ -328,7 +308,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private fun displaySavedNotes() {
 
-        //TODO: we'll be getting the list of notes from the DB here, now just using listOfSavedNotes
+        //TODO: we'll be getting the list of notes from the DB here, now just using
+
+        //TODO: display markers for the saved notes on a map
+
+        //marker test
+        val sydney = LatLng(47.8205915, 35.045926)
+        mMap.addMarker(
+            MarkerOptions()
+                .position(sydney)
+                .title("Marker in Sydney")
+        )
+
 
         setupNotesListRecyclerView(listOfSavedNotes)
     }
@@ -342,26 +333,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvNearbyPlacesList?.visibility = View.VISIBLE
-        Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
-
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
             }
         })
-
-        Log.d("debug", "Number of saved notes:${listOfSavedNotes.size}")
-
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
     override fun onStart() {
         super.onStart()
-        Log.e("debug", "We're back in the game!")
 
         if(isLocationEnabled()){
-
             getFusedUserLocation()
             val mapFragment =
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
@@ -372,7 +356,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
 
 
-        Log.e("debug", "we're in setupNearbyPlacesRecyclerView, places number: ${nearbyPlaceList.size}")
+
         binding?.rvNearbyPlacesList?.layoutManager = LinearLayoutManager(this@MainActivity)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
         binding?.rvNearbyPlacesList?.setHasFixedSize(true)
@@ -380,8 +364,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvNearbyPlacesList?.visibility = View.VISIBLE
-        Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
-
 
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {

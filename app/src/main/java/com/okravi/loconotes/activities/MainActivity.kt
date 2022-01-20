@@ -38,6 +38,7 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.okravi.loconotes.R
 import com.okravi.loconotes.adapters.NearbyPlacesAdapter
+import com.okravi.loconotes.adapters.NotesAdapter
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import java.util.*
@@ -74,7 +75,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         mapFragment!!.getMapAsync(this)
 
         binding?.btnAddNote?.setOnClickListener(this)
-
+        binding?.btnListNotes?.setOnClickListener(this)
 
         //animating the buttons
         binding?.btnSettings?.translationX = 250F
@@ -301,6 +302,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
+                Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show()
                 Log.e("debug", "Add button clicked")
 
                 if(isLocationEnabled()) {
@@ -311,7 +313,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
 
             }
+
+            binding?.btnListNotes?.id -> {
+                Toast.makeText(this, "list button", Toast.LENGTH_SHORT).show()
+                Log.e("debug", "List notes button clicked")
+
+                displaySavedNotes()
+
+            }
         }
+
+
+    }
+
+    private fun displaySavedNotes() {
+
+        //TODO: we'll be getting the list of notes from the DB here, now just using listOfSavedNotes
+
+        setupNotesListRecyclerView(listOfSavedNotes)
+    }
+
+    private fun setupNotesListRecyclerView(notesList: ArrayList<LocationNoteModel>) {
+
+        binding?.rvNearbyPlacesList?.layoutManager = LinearLayoutManager(this@MainActivity)
+        val notesAdapter = NotesAdapter(items = notesList)
+        binding?.rvNearbyPlacesList?.setHasFixedSize(true)
+        binding?.rvNearbyPlacesList?.adapter = notesAdapter
+
+        binding?.tvNoRecordsAvailable?.visibility = View.GONE
+        binding?.rvNearbyPlacesList?.visibility = View.VISIBLE
+        Log.e("debug", "we're in the END of setupNearbyPlacesRecyclerView")
+
+
+        notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
+            override fun onClick(position: Int, model: LocationNoteModel) {
+                Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        Log.d("debug", "Number of saved notes:${listOfSavedNotes.size}")
+
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions

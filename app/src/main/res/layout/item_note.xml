@@ -36,7 +36,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tvTitle"
+                    android:id="@+id/tvNoteTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
@@ -45,7 +45,7 @@
                     tools:text="Name" />
 
                 <TextView
-                    android:id="@+id/tvDescription"
+                    android:id="@+id/tvTextNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"

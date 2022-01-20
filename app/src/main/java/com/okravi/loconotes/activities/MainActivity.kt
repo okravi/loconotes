@@ -17,9 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -222,6 +221,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
         }
+
+        mMap.setOnMarkerClickListener { marker ->
+            if (marker.isInfoWindowShown) {
+
+                marker.hideInfoWindow()
+                Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT).show()
+            } else {
+                marker.showInfoWindow()
+                Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT).show()
+            }
+            true
+        }
+
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -308,19 +320,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private fun displaySavedNotes() {
 
-        //TODO: we'll be getting the list of notes from the DB here, now just using
+        //TODO: we'll be getting the list of notes from the DB here later on
 
-        //TODO: display markers for the saved notes on a map
+        //displaying locations of saved notes on a map
+        for (i in 0 until listOfSavedNotes.size) {
 
-        //marker test
-        val sydney = LatLng(47.8205915, 35.045926)
-        mMap.addMarker(
-            MarkerOptions()
-                .position(sydney)
-                .title("Marker in Sydney")
-        )
-
-
+            val markerPosition = LatLng(listOfNearbyPlaces[i].placeLatitude.toDouble(),
+                listOfNearbyPlaces[i].placeLongitude.toDouble())
+            val marker = mMap.addMarker(
+                MarkerOptions()
+                    .position(markerPosition)
+                    .title(listOfSavedNotes[i].placeName)
+            )
+            //TODO: change the tag from Google Place ID to a unique DB identifier
+            marker?.tag = listOfSavedNotes[i].googlePlaceID
+            marker?.snippet = listOfSavedNotes[i].textNote
+        }
         setupNotesListRecyclerView(listOfSavedNotes)
     }
 
@@ -339,6 +354,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
             }
         })
+        binding?.rvNearbyPlacesList?.scheduleLayoutAnimation()
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
@@ -354,8 +370,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
-
-
 
         binding?.rvNearbyPlacesList?.layoutManager = LinearLayoutManager(this@MainActivity)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
@@ -392,7 +406,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         })
         binding?.rvNearbyPlacesList?.scheduleLayoutAnimation()
-        Log.d("debug", "${listOfSavedNotes.size}")
 
     }
 

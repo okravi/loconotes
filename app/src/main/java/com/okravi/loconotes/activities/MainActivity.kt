@@ -409,7 +409,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 dialog.show()
             }
         })
-
+        binding?.rvNearbyPlacesList?.scheduleLayoutAnimation()
         Log.d("debug", "${listOfSavedNotes.size}")
 
     }

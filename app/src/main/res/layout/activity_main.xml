@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     tools:context=".activities.MainActivity"
-    android:background="#EAE8DC">
+    android:background="@color/main_background">
 
 
         <LinearLayout
@@ -34,13 +34,13 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="3dp"
                     android:layout_marginTop="5dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="12dp"
+                    app:cardCornerRadius="1dp"
+                    app:cardElevation="8dp"
                     >
 
                     <fragment
                         android:id="@+id/map_fragment"
-                        android:background="@drawable/outlined_background"
+                        android:background="@drawable/outlined_flat_background"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -53,18 +53,22 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:orientation="vertical"
+                    android:elevation="8dp"
+
+
                     >
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSettings"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
-                            android:background="@drawable/outlined_background"
-                            app:backgroundTint="#0e3746"
-                            android:layout_marginStart="3dp"
-                            android:layout_marginEnd="5dp"
-                            android:layout_marginTop="5dp"
+                            android:background="@drawable/outlined_flat_background"
+                            app:backgroundTint="@color/main_background"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="8dp"
                             android:text="SET"
+                            android:elevation="8dp"
                             android:textColor="#0e3746"
                             android:textSize="25sp"
                             android:textStyle="bold"
@@ -76,8 +80,8 @@
                             android:id="@+id/btnAddNote"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
-                            android:background="@drawable/outlined_background"
-                            app:backgroundTint="#0e3746"
+                            android:background="@drawable/outlined_flat_background"
+                            app:backgroundTint="@color/main_background"
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
                             android:layout_marginTop="5dp"
@@ -94,8 +98,8 @@
                             android:id="@+id/btnListNotes"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
-                            android:background="@drawable/outlined_background"
-                            app:backgroundTint="#0e3746"
+                            android:background="@drawable/outlined_flat_background"
+                            app:backgroundTint="@color/main_background"
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
                             android:layout_marginTop="5dp"
@@ -123,18 +127,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.6"
-            android:background="@drawable/outlined_background"
+            android:background="@drawable/outlined_flat_background"
+            app:backgroundTint="@color/main_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:elevation="8dp">
 
 
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_nearby_places_list"
-                    android:background="#EAE8DC"
+                    android:background="@color/main_background"
                     android:layout_width="match_parent"
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="10dp"
@@ -143,6 +149,8 @@
                     android:visibility="gone"
                     tools:visibility="gone"
                     android:padding="10dp"
+                    android:layoutAnimation="@anim/layout_animation"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     />
 
 

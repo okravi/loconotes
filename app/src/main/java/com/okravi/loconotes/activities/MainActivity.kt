@@ -18,7 +18,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.common.api.ApiException
@@ -28,14 +27,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.PlaceLikelihood
 import com.google.android.libraries.places.api.net.FetchPhotoRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -47,6 +44,10 @@ import com.okravi.loconotes.adapters.NotesAdapter
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import java.util.*
+
+
+
+
 
 private var binding : ActivityMainBinding? = null
 
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     // This will store current location info
 
     private var currentLocation: Location? = null
-    private val maxNumberOfNearbyPlacesToShowUser = 5
+    private val maxNumberOfNearbyPlacesToShowUser = 10
     private var nearbyPlacesInRecyclerView: Boolean = false
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
 
@@ -92,11 +93,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnSettings?.translationX = 250F
         binding?.btnSettings?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(350)?.duration = 1100
-
         binding?.btnAddNote?.translationX = 250F
         binding?.btnAddNote?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(200)?.duration = 1100
-
         binding?.btnListNotes?.translationX = 250F
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
@@ -251,6 +250,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //in the onClick function
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
+        var placesWithPhotosCounter = 0
+        var bitmapsSavedCounter = 0
         var cycleCounter = 0
         //Client that exposes the Places API methods
         val placesClient = Places.createClient(this)
@@ -282,6 +283,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                 val photoMetadata = placeLikelihood.place
                                     .photoMetadatas?.first()
                                 if (photoMetadata != null){
+                                    placesWithPhotosCounter += 1
                                     Log.d("debug", "we have a photo")
                                     val photoRequest = FetchPhotoRequest
                                         .builder(photoMetadata)
@@ -291,14 +293,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                             500)
                                         .build()
 
+                                    //val bitmap = placesClient.fetchPhoto(photoRequest)
+                                    //nearbyLocation.photo = bitmap
+
                                     placesClient.fetchPhoto(photoRequest)
                                         .addOnSuccessListener { fetchPhotoResponse ->
                                             val bitmap = fetchPhotoResponse.bitmap
                                             nearbyLocation.photo = bitmap
-                                            //TODO: fix this, we should refresh the recycler view once each photo is loaded
-                                            if (::nearbyPlacesAdapter.isInitialized){
-                                                nearbyPlacesAdapter.notifyDataSetChanged()
+                                            bitmapsSavedCounter += 1
+                                            //TODO: this is a temporary solution to photos loading late
+                                            if (bitmapsSavedCounter == placesWithPhotosCounter){
+                                                setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
+
+
+                                            //val adapter: NearbyPlacesAdapter = NearbyPlacesAdapter as NearbyPlacesAdapter
+                                            //adapter . yourSetterMethod newList adapter . notifyDataSetChanged ()
 
 
                                             Log.d("debug", "Saving found photo to nearbyLocation: $bitmap")
@@ -312,6 +322,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                                             "statusCode: " + statusCode)
                                             }
                                         }
+
                                 }
 
                                         if (nearbyLocation.googlePlaceID != "") {
@@ -321,10 +332,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
 
                             }
+                            /*
                             ((cycleCounter==maxNumberOfNearbyPlacesToShowUser) ||
                                     (placeLikelihood.place.id!!.toString() == "")) -> {
                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
-                            }
+
+                            }*/
                         }
                     }
 

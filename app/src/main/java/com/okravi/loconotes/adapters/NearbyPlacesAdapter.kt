@@ -61,6 +61,7 @@ class NearbyPlacesAdapter(
 
     interface OnClickListener{
         fun onClick(position: Int, model: LocationNoteModel)
+
     }
     //describe item view and metadata about its place within the RecyclerView
     private class MyViewHolder(binding: ItemNearbyPlaceBinding):
@@ -70,6 +71,7 @@ class NearbyPlacesAdapter(
         var ivNearbyPlacePhoto = binding.ivNearbyPlacePhoto
 
     }
+
 }
 
 

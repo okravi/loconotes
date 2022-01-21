@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 5
+    private var nearbyPlacesInRecyclerView: Boolean = false
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -278,13 +279,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                                 cycleCounter += 1
 
-                                        if (nearbyLocation.googlePlaceID != "") {
-                                    listOfNearbyPlaces.add(nearbyLocation)
-                                }
-
                                 val photoMetadata = placeLikelihood.place
                                     .photoMetadatas?.first()
                                 if (photoMetadata != null){
+                                    Log.d("debug", "we have a photo")
                                     val photoRequest = FetchPhotoRequest
                                         .builder(photoMetadata)
                                         .setMaxWidth(
@@ -297,7 +295,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                         .addOnSuccessListener { fetchPhotoResponse ->
                                             val bitmap = fetchPhotoResponse.bitmap
                                             nearbyLocation.photo = bitmap
-                                            Log.d("debug", "photo: $bitmap")
+                                            //TODO: fix this, we should refresh the recycler view once each photo is loaded
+                                            if (::nearbyPlacesAdapter.isInitialized){
+                                                nearbyPlacesAdapter.notifyDataSetChanged()
+                                            }
+
+
+                                            Log.d("debug", "Saving found photo to nearbyLocation: $bitmap")
                                             // Next step here
                                         }.addOnFailureListener { exception ->
                                             if (exception is ApiException) {
@@ -309,6 +313,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                             }
                                         }
                                 }
+
+                                        if (nearbyLocation.googlePlaceID != "") {
+                                    listOfNearbyPlaces.add(nearbyLocation)
+                                            Log.d("debug", "Saving a place to a list")
+                                }
+
+
                             }
                             ((cycleCounter==maxNumberOfNearbyPlacesToShowUser) ||
                                     (placeLikelihood.place.id!!.toString() == "")) -> {
@@ -333,7 +344,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
+
                 Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show()
+
+                //making sure we don't display nearby items twice
+                listOfNearbyPlaces.clear()
 
                 if(isLocationEnabled()) {
                     getListOfLocationsForCurrentPosition()
@@ -409,21 +424,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
 
-
-
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
+
+        Log.d("debug", "Adding places: ${nearbyPlaceList.size}, already in view ${nearbyPlacesAdapter.itemCount} ")
 
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
-        //TODO: this IF should be somewhere else
-        if(nearbyPlacesAdapter.itemCount > 0){
-            Log.d("debug", "Places in adapter:${nearbyPlacesAdapter.itemCount}")
-            nearbyPlacesAdapter.clearView()
-        }
+
 
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
@@ -451,6 +462,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 dialog.show()
             }
         })
+        nearbyPlacesInRecyclerView = true
         binding?.rvList?.scheduleLayoutAnimation()
 
     }

@@ -54,6 +54,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //GoogleMaps class for map manipulation
     private lateinit var mMap: GoogleMap
     // FusedLocationProviderClient - Main class for receiving location updates.
+
+    //testing
+    private lateinit var nearbyPlacesAdapter : NearbyPlacesAdapter
+    //testing
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     // LocationRequest - Requirements for the location updates, i.e.,
     // how often you should receive updates, the priority, etc.
@@ -405,13 +409,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
 
+
+
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
+
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
+        //TODO: this IF should be somewhere else
+        if(nearbyPlacesAdapter.itemCount > 0){
+            Log.d("debug", "Places in adapter:${nearbyPlacesAdapter.itemCount}")
+            nearbyPlacesAdapter.clearView()
+        }
 
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {

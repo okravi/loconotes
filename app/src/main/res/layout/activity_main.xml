@@ -33,7 +33,8 @@
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="3dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="3dp"
                     app:cardCornerRadius="1dp"
                     app:cardElevation="8dp"
                     >
@@ -56,7 +57,7 @@
                     android:elevation="8dp"
                     >
 
-                        <com.google.android.material.button.MaterialButton
+                        <ImageButton
                             android:id="@+id/btnSettings"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
@@ -64,20 +65,16 @@
                             app:backgroundTint="@color/main_background"
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
-                            android:layout_marginTop="5dp"
-                            android:drawableTop="@drawable/ic_baseline_settings_24"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:src="@drawable/ic_baseline_settings_24"
                             android:gravity="center_vertical"
-                            android:textColor="#0e3746"
-                            android:textSize="25sp"
-                            android:textStyle="bold"
                             android:elevation="10dp"
-                            android:stateListAnimator="@null"
-                            app:layout_constraintVertical_bias="0.0"
                             android:layout_weight="1"
                             >
-                        </com.google.android.material.button.MaterialButton>
+                        </ImageButton>
 
-                        <com.google.android.material.button.MaterialButton
+                        <ImageButton
                             android:id="@+id/btnAddNote"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
@@ -85,18 +82,14 @@
                             app:backgroundTint="@color/main_background"
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
-                            android:layout_marginTop="5dp"
-                            android:drawableTop="@drawable/ic_outline_note_add_24"
-                            android:textColor="#0e3746"
-                            android:textSize="25sp"
-                            android:textStyle="bold"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:src="@drawable/ic_outline_note_add_24"
                             android:elevation="10dp"
-                            android:stateListAnimator="@null"
-                            app:layout_constraintVertical_bias="0.0"
                             android:layout_weight="1">
-                        </com.google.android.material.button.MaterialButton>
+                        </ImageButton>
 
-                        <com.google.android.material.button.MaterialButton
+                        <ImageButton
                             android:id="@+id/btnListNotes"
                             android:layout_width="match_parent"
                             android:layout_height="0dip"
@@ -104,16 +97,12 @@
                             app:backgroundTint="@color/main_background"
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
-                            android:layout_marginTop="5dp"
-                            android:drawableTop="@drawable/ic_baseline_list_24"
-                            android:textColor="#0e3746"
-                            android:textSize="25sp"
-                            android:textStyle="bold"
-                            app:layout_constraintVertical_bias="0.0"
+                            android:layout_marginTop="4dp"
+                            android:layout_marginBottom="4dp"
+                            android:src="@drawable/ic_baseline_list_24"
                             android:elevation="10dp"
-                            android:stateListAnimator="@null"
                             android:layout_weight="1">
-                        </com.google.android.material.button.MaterialButton>
+                        </ImageButton>
 
 
                 </LinearLayout>

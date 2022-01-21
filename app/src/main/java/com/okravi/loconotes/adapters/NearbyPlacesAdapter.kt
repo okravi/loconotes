@@ -50,6 +50,11 @@ class NearbyPlacesAdapter(
         this.onClickRecyclerListener = onClickRecyclerListener
     }
 
+    fun clearView(){
+        items.clear()
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return items.size
     }

@@ -54,8 +54,6 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:elevation="8dp"
-
-
                     >
 
                         <com.google.android.material.button.MaterialButton
@@ -64,16 +62,19 @@
                             android:layout_height="0dip"
                             android:background="@drawable/outlined_flat_background"
                             app:backgroundTint="@color/main_background"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginTop="8dp"
-                            android:text="SET"
-                            android:elevation="8dp"
+                            android:layout_marginStart="3dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginTop="5dp"
+                            android:drawableTop="@drawable/ic_baseline_settings_24"
+                            android:gravity="center_vertical"
                             android:textColor="#0e3746"
                             android:textSize="25sp"
                             android:textStyle="bold"
+                            android:elevation="10dp"
+                            android:stateListAnimator="@null"
                             app:layout_constraintVertical_bias="0.0"
-                            android:layout_weight="1">
+                            android:layout_weight="1"
+                            >
                         </com.google.android.material.button.MaterialButton>
 
                         <com.google.android.material.button.MaterialButton
@@ -85,12 +86,13 @@
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
                             android:layout_marginTop="5dp"
-                            android:text="@string/btn_add_text"
+                            android:drawableTop="@drawable/ic_outline_note_add_24"
                             android:textColor="#0e3746"
                             android:textSize="25sp"
                             android:textStyle="bold"
+                            android:elevation="10dp"
+                            android:stateListAnimator="@null"
                             app:layout_constraintVertical_bias="0.0"
-
                             android:layout_weight="1">
                         </com.google.android.material.button.MaterialButton>
 
@@ -103,11 +105,13 @@
                             android:layout_marginStart="3dp"
                             android:layout_marginEnd="5dp"
                             android:layout_marginTop="5dp"
-                            android:text="NOT"
+                            android:drawableTop="@drawable/ic_baseline_list_24"
                             android:textColor="#0e3746"
                             android:textSize="25sp"
                             android:textStyle="bold"
                             app:layout_constraintVertical_bias="0.0"
+                            android:elevation="10dp"
+                            android:stateListAnimator="@null"
                             android:layout_weight="1">
                         </com.google.android.material.button.MaterialButton>
 
@@ -139,7 +143,7 @@
 
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_nearby_places_list"
+                    android:id="@+id/rv_list"
                     android:background="@color/main_background"
                     android:layout_width="match_parent"
                     android:layout_gravity="center"

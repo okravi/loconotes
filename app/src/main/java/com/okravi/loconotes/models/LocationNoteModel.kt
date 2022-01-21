@@ -1,5 +1,6 @@
 package com.okravi.loconotes.models
 
+import android.graphics.Bitmap
 import java.io.Serializable
 
 data class LocationNoteModel(
@@ -10,6 +11,8 @@ data class LocationNoteModel(
     var placeLikelyHood: Double = 0.0,
     var dateNoteLastModified: String = "",
     var textNote: String = "",
-    var isSelected: Boolean = false
+    var isSelected: Boolean = false,
+    var photoMetadata: String ="",
+    var photo: Bitmap? = null
 
     ): Serializable

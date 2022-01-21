@@ -32,6 +32,10 @@ class NearbyPlacesAdapter(
             holder.tvNearbyPlaceName.text = model.placeName
             Log.e("debug", "we're binding each item to a view")
 
+            if(model.photo != null){
+                holder.ivNearbyPlacePhoto.setImageBitmap(model.photo)
+            }
+
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
 
@@ -58,6 +62,7 @@ class NearbyPlacesAdapter(
         RecyclerView.ViewHolder(binding.root){
 
         var tvNearbyPlaceName = binding.tvNearbyPlaceName
+        var ivNearbyPlacePhoto = binding.ivNearbyPlacePhoto
 
     }
 }

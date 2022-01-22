@@ -39,7 +39,7 @@ class NearbyPlacesAdapter(
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
 
-                    //TODO: (it) might not be right here
+
                     onClickRecyclerListener!!.onClick(position, model)
                 }
             }

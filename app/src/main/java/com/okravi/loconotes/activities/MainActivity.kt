@@ -4,9 +4,11 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
@@ -105,6 +107,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //Checking if location permissions are granted
     private fun isLocationEnabled(): Boolean {
+
+        val locationManager: LocationManager =
+            getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+        /* TODO: remove this part later on, we should be checking the phone's location settings here
         return !(ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -112,6 +121,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
         ) != PackageManager.PERMISSION_GRANTED)
+
+         */
     }
 
     //Checking whether user granted the location permissions

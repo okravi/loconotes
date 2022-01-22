@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     // This will store current location info
 
     private var currentLocation: Location? = null
-    private val maxNumberOfNearbyPlacesToShowUser = 10
+    private val maxNumberOfNearbyPlacesToShowUser = 30
     private var nearbyPlacesInRecyclerView: Boolean = false
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
 
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     var listOfSavedNotes = ArrayList<LocationNoteModel>(5)
 
-    //Checking if location permissions are granted
+    //Checking if location provider is enabled for all apps
     private fun isLocationEnabled(): Boolean {
 
         val locationManager: LocationManager =
@@ -336,7 +336,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                                 }
 
-                                        if (nearbyLocation.googlePlaceID != "") {
+                                        if (photoMetadata != null) {
                                     listOfNearbyPlaces.add(nearbyLocation)
                                             Log.d("debug", "Saving a place to a list")
                                 }
@@ -413,6 +413,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             marker?.tag = listOfSavedNotes[i].googlePlaceID
             marker?.snippet = listOfSavedNotes[i].textNote
         }
+        Log.d("debug", "we'll be setting up notes rv, the first image is ${listOfSavedNotes[0].photo}")
         setupNotesListRecyclerView(listOfSavedNotes)
     }
 
@@ -477,9 +478,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         newNote.googlePlaceID = listOfNearbyPlaces[position].googlePlaceID
                         newNote.placeLongitude = listOfNearbyPlaces[position].placeLongitude
                         newNote.placeLatitude = listOfNearbyPlaces[position].placeLatitude
+                        newNote.photo = listOfNearbyPlaces[position].photo
                         listOfSavedNotes.add(newNote)
 
                         Log.d("debug", "Size of listOfSavedNotes:${listOfSavedNotes[listOfSavedNotes.size-1]}, ${editTextInput}")
+
+                        //displaying the whole list of notes after adding new one
+                        setupNotesListRecyclerView(listOfSavedNotes)
                     }
                     .setNegativeButton("Cancel", null)
                     .create()

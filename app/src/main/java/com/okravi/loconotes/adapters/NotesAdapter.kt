@@ -31,7 +31,8 @@ class NotesAdapter(
         if (holder is MyViewHolder) {
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote
-            Log.e("debug", "we're binding each item to a view")
+            holder.ivNoteImage.setImageBitmap(model.photo)
+            Log.e("debug", "we're binding each item to a view, image is ${model.photo}")
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
@@ -60,6 +61,7 @@ class NotesAdapter(
 
         var tvNoteTitle = binding.tvNoteTitle
         var tvTextNote = binding.tvTextNote
+        var ivNoteImage = binding.ivItemNote
 
     }
 }

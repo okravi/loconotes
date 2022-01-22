@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.btnAddNote?.setOnClickListener(this)
         binding?.btnListNotes?.setOnClickListener(this)
+        binding?.btnSettings?.setOnClickListener(this)
 
         //animating the buttons
         binding?.btnSettings?.translationX = 250F
@@ -107,22 +108,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //Checking if location provider is enabled for all apps
     private fun isLocationEnabled(): Boolean {
-
         val locationManager: LocationManager =
             getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-
-        /* TODO: remove this part later on, we should be checking the phone's location settings here
-        return !(ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) != PackageManager.PERMISSION_GRANTED)
-
-         */
     }
 
     //Checking whether user granted the location permissions
@@ -231,7 +220,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
 
     //Displaying users location on the map. Checking permissions with isLocationEnabled()
-    //@SuppressLint("MissingPermission")
+
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
 
@@ -254,7 +243,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
             true
         }
-
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -278,7 +266,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
-                        //Saving 5 top probability places to the list
+                        //Saving top probability places to the list if they have photos
                         when {
                             cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
 
@@ -298,14 +286,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                     Log.d("debug", "we have a photo")
                                     val photoRequest = FetchPhotoRequest
                                         .builder(photoMetadata)
-                                        .setMaxWidth(
-                                            500)
-                                        .setMaxHeight(
-                                            500)
+                                        .setMaxWidth(500)
+                                        .setMaxHeight(500)
                                         .build()
-
-                                    //val bitmap = placesClient.fetchPhoto(photoRequest)
-                                    //nearbyLocation.photo = bitmap
 
                                     placesClient.fetchPhoto(photoRequest)
                                         .addOnSuccessListener { fetchPhotoResponse ->
@@ -317,13 +300,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
 
-
-                                            //val adapter: NearbyPlacesAdapter = NearbyPlacesAdapter as NearbyPlacesAdapter
-                                            //adapter . yourSetterMethod newList adapter . notifyDataSetChanged ()
-
-
-                                            Log.d("debug", "Saving found photo to nearbyLocation: $bitmap")
-                                            // Next step here
                                         }.addOnFailureListener { exception ->
                                             if (exception is ApiException) {
                                                 val statusCode = exception.statusCode
@@ -333,29 +309,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                                             "statusCode: " + statusCode)
                                             }
                                         }
-
                                 }
-
                                         if (photoMetadata != null) {
                                     listOfNearbyPlaces.add(nearbyLocation)
                                             Log.d("debug", "Saving a place to a list")
                                 }
-
-
                             }
-                            /*
-                            ((cycleCounter==maxNumberOfNearbyPlacesToShowUser) ||
-                                    (placeLikelihood.place.id!!.toString() == "")) -> {
-                                setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
-
-                            }*/
                         }
                     }
-
                 } else {
                     val exception = task.exception
                     if (exception is ApiException) {
-
+                        val statusCode = exception.statusCode
+                        Log.e(TAG,
+                            "Place not found: " +
+                                    exception.message + ", " +
+                                    "statusCode: " + statusCode)
                     }
                 }
             }
@@ -368,8 +337,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
-
-                Toast.makeText(this, "Add button", Toast.LENGTH_SHORT).show()
 
                 //making sure we don't display nearby items twice
                 listOfNearbyPlaces.clear()
@@ -385,19 +352,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
             binding?.btnListNotes?.id -> {
                 Toast.makeText(this, "list button", Toast.LENGTH_SHORT).show()
-                Log.e("debug", "List notes button clicked")
 
-                displaySavedNotes()
+                if (listOfSavedNotes.size > 0){
+                    setupNotesListRecyclerView(listOfSavedNotes)
+                }else{
+                    Toast.makeText(this, "No notes saved!", Toast.LENGTH_SHORT).show()
+                }
+            }
 
+            binding?.btnSettings?.id -> {
+                Toast.makeText(this, "Settings button clicked", Toast.LENGTH_SHORT).show()
             }
         }
 
 
     }
 
-    private fun displaySavedNotes() {
+    private fun getSavedNotesFromDB(){
+        //TODO: not yet implemented
+    }
 
-        //TODO: we'll be getting the list of notes from the DB here later on
+    private fun displaySavedNotesMarkersOnMap() {
 
         //displaying locations of saved notes on a map
         for (i in 0 until listOfSavedNotes.size) {
@@ -413,8 +388,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             marker?.tag = listOfSavedNotes[i].googlePlaceID
             marker?.snippet = listOfSavedNotes[i].textNote
         }
-        Log.d("debug", "we'll be setting up notes rv, the first image is ${listOfSavedNotes[0].photo}")
-        setupNotesListRecyclerView(listOfSavedNotes)
     }
 
     private fun setupNotesListRecyclerView(notesList: ArrayList<LocationNoteModel>) {
@@ -433,6 +406,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
+        displaySavedNotesMarkersOnMap()
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions

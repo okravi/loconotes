@@ -197,6 +197,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         )
     }
 
+    //testing
+    var previousUserLocation : LatLng =  LatLng(-0.0, 0.0)
+    //testing
+
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
         //Zooming in only upon the app's start
@@ -209,12 +213,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val mLongitude = currentLocation!!.longitude
             //Zooming in on user's location
             val position = LatLng(mLatitude, mLongitude)
-            if (!alreadyZoomedIn){
 
+            //TODO: see if we should check the alreadyZoomed in here as well
+            if ((position != previousUserLocation)){
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
                 alreadyZoomedIn = true
                 mMap.animateCamera(newLatLngZoom)
             }
+
+            previousUserLocation = position
         }
     }
 
@@ -243,6 +250,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
             true
         }
+    }
+
+    override fun onResume() {
+        //TODO check if this is really needed (when user gives the permission)
+        super.onResume()
+        val mapFragment =
+            supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+        mapFragment!!.getMapAsync(this)
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -369,7 +384,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun getSavedNotesFromDB(){
-        //TODO: not yet implemented
+        //TODO
+
     }
 
     private fun displaySavedNotesMarkersOnMap() {

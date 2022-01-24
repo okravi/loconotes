@@ -136,8 +136,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             ).withListener(object : MultiplePermissionsListener {
 
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-
-                    getFusedUserLocation()
+                    if (report!!.areAllPermissionsGranted()){
+                        getFusedUserLocation()
+                    }
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
@@ -419,6 +420,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
+
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
@@ -455,6 +457,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             override fun onClick(position: Int, model: LocationNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a place", Toast.LENGTH_SHORT).show()
 
+                /*
                 val inputEditTextField = EditText(this@MainActivity)
                 val dialog = AlertDialog.Builder(this@MainActivity)
                     .setTitle("")
@@ -479,12 +482,50 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     .setNegativeButton("Cancel", null)
                     .create()
                 dialog.show()
+
+                 */
+                val newNote = LocationNoteModel()
+
+                newNote.textNote = ""
+                newNote.placeName = listOfNearbyPlaces[position].placeName
+                newNote.googlePlaceID = listOfNearbyPlaces[position].googlePlaceID
+                newNote.placeLongitude = listOfNearbyPlaces[position].placeLongitude
+                newNote.placeLatitude = listOfNearbyPlaces[position].placeLatitude
+                //TODO: decode bitmap to make serializable work
+
+                /*
+
+
+I know where the problem is in your case and that is about the BitMap All you need to do is Decode your BitMap before sending into intent
+
+Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.thumbsup);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        largeIcon.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+
+And then send the following Object in intent
+
+intent.putExtras("remindermessage",object);
+
+and if not about the Bitmap then you should look for other things which might be taking more space and decode them before sending into intent
+
+                 */
+                //newNote.photo = listOfNearbyPlaces[position].photo
+
+                val intent = Intent(this@MainActivity, NoteEditActivity::class.java)
+                intent.putExtra(PLACE_DATA, newNote)
+                startActivity(intent)
             }
         })
         nearbyPlacesInRecyclerView = true
         binding?.rvList?.scheduleLayoutAnimation()
 
     }
+
+    companion object {
+        var PLACE_DATA = "place_data"
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()

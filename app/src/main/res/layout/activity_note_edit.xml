@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context=".activities.MainActivity"
+    android:background="@color/main_background">
+
+
+    <LinearLayout
+
+        android:id="@+id/llTop"
+        android:layout_height="0dp"
+        android:layout_width="0dip"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/llBottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.35"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/map_widget"
+            android:layout_weight="3.8"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="3dp"
+            app:cardCornerRadius="1dp"
+            app:cardElevation="8dp"
+            >
+
+            <ImageView
+                android:id="@+id/map_fragment"
+                android:background="@drawable/outlined_flat_background"
+                android:src="@drawable/ic_baseline_settings_24"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:id="@+id/btnGroup"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:elevation="8dp"
+            >
+
+            <ImageButton
+                android:id="@+id/btnSettings"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:background="@drawable/outlined_flat_background"
+                app:backgroundTint="@color/main_background"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ic_baseline_settings_24"
+                android:gravity="center_vertical"
+                android:elevation="10dp"
+                android:layout_weight="1"
+                >
+            </ImageButton>
+
+            <ImageButton
+                android:id="@+id/btnAddNote"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:background="@drawable/outlined_flat_background"
+                app:backgroundTint="@color/main_background"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ic_outline_note_add_24"
+                android:elevation="10dp"
+                android:layout_weight="1">
+            </ImageButton>
+
+            <ImageButton
+                android:id="@+id/btnListNotes"
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:background="@drawable/outlined_flat_background"
+                app:backgroundTint="@color/main_background"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:src="@drawable/ic_baseline_list_24"
+                android:elevation="10dp"
+                android:layout_weight="1">
+            </ImageButton>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:id="@+id/llBottom"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_width="0dip"
+        app:layout_constraintTop_toBottomOf="@+id/llTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintHeight_percent="0.6"
+        android:background="@drawable/outlined_flat_background"
+        app:backgroundTint="@color/main_background"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:elevation="8dp">
+
+
+        <EditText
+            android:id="@+id/et_place_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Place Name"
+            android:textColor="#0e3746"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_latitude"
+                android:layout_weight="1"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="latitude"
+                android:textColor="#0e3746"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/et_longitude"
+                android:layout_weight="1"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="longitude"
+                android:textColor="#0e3746"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="A sample note about a place"
+            android:textColor="#0e3746"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnSaveNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintHeight_percent="0.35"
+
+            android:text="SUBMIT"
+            android:textColor="@color/black"
+
+
+            android:layout_margin="5dp"
+            android:elevation="8dp"
+            />
+
+    </LinearLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

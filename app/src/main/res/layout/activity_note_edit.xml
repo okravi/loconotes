@@ -105,8 +105,8 @@
 
         </LinearLayout>
 
-
     </LinearLayout>
+
 
     <LinearLayout
 
@@ -118,7 +118,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
 
-        app:layout_constraintHeight_percent="0.6"
+        app:layout_constraintHeight_percent="0.55"
         android:background="@drawable/outlined_flat_background"
         app:backgroundTint="@color/main_background"
         android:layout_marginLeft="10dp"
@@ -128,9 +128,7 @@
         android:orientation="vertical"
         android:elevation="8dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+
 
             <EditText
                 android:id="@+id/et_place_name"
@@ -141,9 +139,7 @@
                 android:text="Place Name"
                 android:textColor="#0e3746"
                 android:textSize="16sp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+
                 />
 
             <LinearLayout
@@ -152,10 +148,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
 
-                app:layout_constraintTop_toBottomOf="@id/et_place_name"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+               >
 
                 <EditText
                     android:id="@+id/et_latitude"
@@ -184,39 +177,24 @@
             <EditText
                 android:id="@+id/et_note"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dip"
                 android:layout_marginBottom="10dp"
-                android:gravity="center"
-
+                android:gravity="top"
+                android:layout_weight="1"
                 android:text="A sample note about a place"
                 android:textColor="#0e3746"
                 android:textSize="16sp"
 
-                app:layout_constraintTop_toBottomOf="@id/edit_note_latlng"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+
+
+
+
                 />
 
-            <Button
-                android:id="@+id/btnSaveNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
 
 
-                android:layout_margin="0dp"
-                android:elevation="8dp"
-                android:gravity="center|bottom"
-
-                android:text="SUBMIT"
-                android:textColor="@color/black"
-
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                 />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
@@ -226,6 +204,32 @@
 
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSaveNote1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+
+        android:layout_margin="5dp"
+        android:elevation="8dp"
+
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+
+
+        android:gravity="center"
+
+        android:textColor="#0e3746"
+        android:textSize="16sp"
+
+        android:text="SUBMIT"
+
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 

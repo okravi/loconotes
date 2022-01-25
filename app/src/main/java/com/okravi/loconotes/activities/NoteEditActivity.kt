@@ -1,10 +1,11 @@
 package com.okravi.loconotes.activities
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import com.okravi.loconotes.databinding.ActivityMainBinding
+import androidx.appcompat.app.AppCompatActivity
 import com.okravi.loconotes.databinding.ActivityNoteEditBinding
 import com.okravi.loconotes.models.LocationNoteModel
+
 
 private var binding : ActivityNoteEditBinding? = null
 
@@ -19,10 +20,17 @@ class NoteEditActivity : AppCompatActivity() {
 
 
         if(intent.hasExtra(MainActivity.PLACE_DATA)){
-            var placeData = intent.getSerializableExtra(
+            val placeData = intent.getSerializableExtra(
                 MainActivity.PLACE_DATA) as LocationNoteModel
 
-           binding?.etPlaceName?.setText(placeData.placeName)
+            binding?.etPlaceName?.setText(placeData.placeName)
+            binding?.etLatitude?.setText(placeData.placeLatitude)
+            binding?.etLongitude?.setText(placeData.placeLongitude)
+
+            val byteArray = placeData.photoByteArray
+            val bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+
+            binding?.placePhoto?.setImageBitmap(bmp)
 
 
         }

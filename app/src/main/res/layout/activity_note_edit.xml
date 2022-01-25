@@ -24,7 +24,7 @@
         >
 
         <androidx.cardview.widget.CardView
-            android:id="@+id/map_widget"
+            android:id="@+id/photo_widget"
             android:layout_weight="3.8"
             android:layout_width="0dip"
             android:layout_height="match_parent"
@@ -38,7 +38,7 @@
             >
 
             <ImageView
-                android:id="@+id/map_fragment"
+                android:id="@+id/place_photo"
                 android:background="@drawable/outlined_flat_background"
                 android:src="@drawable/ic_baseline_settings_24"
                 android:layout_width="match_parent"
@@ -128,69 +128,102 @@
         android:orientation="vertical"
         android:elevation="8dp">
 
-
-        <EditText
-            android:id="@+id/et_place_name"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="Place Name"
-            android:textColor="#0e3746"
-            android:textSize="16sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent">
 
             <EditText
-                android:id="@+id/et_latitude"
-                android:layout_weight="1"
-                android:layout_width="0dip"
+                android:id="@+id/et_place_name"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="latitude"
+                android:text="Place Name"
                 android:textColor="#0e3746"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+
+            <LinearLayout
+                android:id="@+id/edit_note_latlng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+
+                app:layout_constraintTop_toBottomOf="@id/et_place_name"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <EditText
+                    android:id="@+id/et_latitude"
+                    android:layout_weight="1"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:text="latitude"
+                    android:textColor="#0e3746"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/et_longitude"
+                    android:layout_weight="1"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:text="longitude"
+                    android:textColor="#0e3746"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
             <EditText
-                android:id="@+id/et_longitude"
-                android:layout_weight="1"
-                android:layout_width="0dip"
+                android:id="@+id/et_note"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="longitude"
+
+                android:text="A sample note about a place"
                 android:textColor="#0e3746"
-                android:textSize="16sp" />
+                android:textSize="16sp"
 
-        </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/edit_note_latlng"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
 
-        <EditText
-            android:id="@+id/et_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:text="A sample note about a place"
-            android:textColor="#0e3746"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/btnSaveNote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintHeight_percent="0.35"
-
-            android:text="SUBMIT"
-            android:textColor="@color/black"
+            <Button
+                android:id="@+id/btnSaveNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
 
-            android:layout_margin="5dp"
-            android:elevation="8dp"
-            />
+                android:layout_margin="0dp"
+                android:elevation="8dp"
+                android:gravity="center|bottom"
+
+                android:text="SUBMIT"
+                android:textColor="@color/black"
+
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                 />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
 
     </LinearLayout>
 

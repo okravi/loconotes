@@ -7,6 +7,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -46,9 +47,11 @@ import com.okravi.loconotes.adapters.NotesAdapter
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import java.util.*
+//import android.R
+import android.content.res.Resources
 
-
-
+import android.graphics.Bitmap
+import java.io.ByteArrayOutputStream
 
 
 private var binding : ActivityMainBinding? = null
@@ -511,6 +514,18 @@ and if not about the Bitmap then you should look for other things which might be
 
                  */
                 //newNote.photo = listOfNearbyPlaces[position].photo
+
+                //testing
+                val stream = ByteArrayOutputStream()
+                listOfNearbyPlaces[position].photo?.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                val byteArray: ByteArray = stream.toByteArray()
+
+                //val in1 = Intent(this, Activity2::class.java)
+                //in1.putExtra("image", byteArray)
+                //newNote.photo = BitmapFactory.decodeResource(getResources(), listOfNearbyPlaces[position].photo)
+                //testing
+
+                newNote.photoByteArray = byteArray
 
                 val intent = Intent(this@MainActivity, NoteEditActivity::class.java)
                 intent.putExtra(PLACE_DATA, newNote)

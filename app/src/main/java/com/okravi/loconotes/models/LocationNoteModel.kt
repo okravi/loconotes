@@ -13,6 +13,7 @@ data class LocationNoteModel (
     var textNote: String = "",
     var isSelected: Boolean = false,
     var photoMetadata: String ="",
-    var photo: Bitmap? = null
+    var photo: Bitmap? = null,
+    var photoByteArray: ByteArray? = null
 
     ): Serializable

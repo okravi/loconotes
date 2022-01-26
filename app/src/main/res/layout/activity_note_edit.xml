@@ -15,7 +15,7 @@
         android:layout_height="0dp"
         android:layout_width="0dip"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/llBottom"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.35"
@@ -46,79 +46,64 @@
                 />
         </androidx.cardview.widget.CardView>
 
-        <LinearLayout
-            android:id="@+id/btnGroup"
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:elevation="8dp"
-            >
 
-            <ImageButton
-                android:id="@+id/btnSettings"
-                android:layout_width="match_parent"
-                android:layout_height="0dip"
-                android:background="@drawable/outlined_flat_background"
-                app:backgroundTint="@color/main_background"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/ic_baseline_settings_24"
-                android:gravity="center_vertical"
-                android:elevation="10dp"
-                android:layout_weight="1"
-                >
-            </ImageButton>
-
-            <ImageButton
-                android:id="@+id/btnAddNote"
-                android:layout_width="match_parent"
-                android:layout_height="0dip"
-                android:background="@drawable/outlined_flat_background"
-                app:backgroundTint="@color/main_background"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/ic_outline_note_add_24"
-                android:elevation="10dp"
-                android:layout_weight="1">
-            </ImageButton>
-
-            <ImageButton
-                android:id="@+id/btnListNotes"
-                android:layout_width="match_parent"
-                android:layout_height="0dip"
-                android:background="@drawable/outlined_flat_background"
-                app:backgroundTint="@color/main_background"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:src="@drawable/ic_baseline_list_24"
-                android:elevation="10dp"
-                android:layout_weight="1">
-            </ImageButton>
-
-
-        </LinearLayout>
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/llMiddle"
+        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/llTop"
+        app:layout_constraintBottom_toTopOf="@+id/llBottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.35"
+        android:layout_margin="5dp"
+        android:orientation="horizontal">
 
+        <ImageButton
+            android:id="@+id/btnLoadPicture"
+
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:background="@drawable/outlined_flat_background"
+            app:backgroundTint="@color/main_background"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/ic_baseline_folder_24"
+            android:elevation="10dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/btnTakePhoto"
+            android:layout_width="0dip"
+            android:layout_height="match_parent"
+            android:background="@drawable/outlined_flat_background"
+            app:backgroundTint="@color/main_background"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/ic_baseline_add_a_photo_24"
+            android:elevation="10dp"
+            android:layout_weight="1"/>
+
+
+    </LinearLayout>
     <LinearLayout
 
         android:id="@+id/llBottom"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_width="0dip"
-        app:layout_constraintTop_toBottomOf="@+id/llTop"
+        app:layout_constraintTop_toBottomOf="@+id/llMiddle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
 
-        app:layout_constraintHeight_percent="0.55"
+        app:layout_constraintHeight_percent="0.45"
         android:background="@drawable/outlined_flat_background"
         app:backgroundTint="@color/main_background"
         android:layout_marginLeft="10dp"
@@ -181,7 +166,9 @@
                 android:layout_marginBottom="10dp"
                 android:gravity="top"
                 android:layout_weight="1"
-                android:text="A sample note about a place"
+                android:hint="A sample note about a place"
+
+
                 android:textColor="#0e3746"
                 android:textSize="16sp"
 
@@ -206,7 +193,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btnSaveNote1"
+        android:id="@+id/btnSaveNote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
@@ -220,10 +207,20 @@
 
         android:gravity="center"
 
+
+        android:background="@drawable/outlined_flat_background"
+        app:backgroundTint="@color/main_background"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+
         android:textColor="#0e3746"
         android:textSize="16sp"
 
         android:text="SUBMIT"
+
+
 
 
         app:layout_constraintBottom_toBottomOf="parent"

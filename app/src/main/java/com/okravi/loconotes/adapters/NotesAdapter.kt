@@ -3,15 +3,14 @@ package com.okravi.loconotes.adapters
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.NonNull
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.okravi.loconotes.databinding.ItemNoteBinding
-import com.okravi.loconotes.models.LocationNoteModel
-
+import com.okravi.loconotes.models.dbNoteModel
 
 
 class NotesAdapter(
-    private val items: ArrayList<LocationNoteModel>
+    private val items: ArrayList<dbNoteModel>
 ):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -31,7 +30,7 @@ class NotesAdapter(
         if (holder is MyViewHolder) {
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote
-            holder.ivNoteImage.setImageBitmap(model.photo)
+            holder.ivNoteImage.setImageURI(model.photo.toUri())
             Log.e("debug", "we're binding each item to a view, image is ${model.photo}")
 
             holder.itemView.setOnClickListener{
@@ -53,7 +52,7 @@ class NotesAdapter(
     }
 
     interface OnClickListener{
-        fun onClick(position: Int, model: LocationNoteModel)
+        fun onClick(position: Int, model: dbNoteModel)
     }
     //describe item view and metadata about its place within the RecyclerView
     private class MyViewHolder(binding: ItemNoteBinding):

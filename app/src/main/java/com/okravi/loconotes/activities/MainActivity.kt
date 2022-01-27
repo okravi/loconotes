@@ -51,7 +51,9 @@ import java.util.*
 import android.content.res.Resources
 
 import android.graphics.Bitmap
+import com.okravi.loconotes.models.dbNoteModel
 import java.io.ByteArrayOutputStream
+import kotlin.collections.ArrayList
 
 
 private var binding : ActivityMainBinding? = null
@@ -107,7 +109,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
     }
 
-    var listOfSavedNotes = ArrayList<LocationNoteModel>(5)
+    var listOfSavedNotes = ArrayList<dbNoteModel>(5)
 
     //Checking if location provider is enabled for all apps
     private fun isLocationEnabled(): Boolean {
@@ -389,9 +391,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     }
 
-    private fun getSavedNotesFromDB(){
-        //TODO
-
+    private fun getSavedNotesFromDB(): ArrayList<dbNoteModel>{
+        //TODO this is to be done on 28/01
+        return listOfSavedNotes
     }
 
     private fun displaySavedNotesMarkersOnMap() {
@@ -412,7 +414,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
-    private fun setupNotesListRecyclerView(notesList: ArrayList<LocationNoteModel>) {
+    private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
 
         binding?.rvList?.layoutManager = LinearLayoutManager(this@MainActivity)
         val notesAdapter = NotesAdapter(items = notesList)
@@ -423,7 +425,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.rvList?.visibility = View.VISIBLE
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
-            override fun onClick(position: Int, model: LocationNoteModel) {
+            override fun onClick(position: Int, model: dbNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
 
             }

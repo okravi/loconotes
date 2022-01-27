@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,8 +22,10 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityNoteEditBinding
 import com.okravi.loconotes.models.LocationNoteModel
+import com.okravi.loconotes.models.dbNoteModel
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -33,6 +36,10 @@ import java.util.*
 private var binding : ActivityNoteEditBinding? = null
 
 class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
+
+    private var savedImagePath : Uri? = null
+    private lateinit var placeData: LocationNoteModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,7 +50,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
 
         if(intent.hasExtra(MainActivity.PLACE_DATA)){
-            val placeData = intent.getSerializableExtra(
+            placeData = intent.getSerializableExtra(
                 MainActivity.PLACE_DATA) as LocationNoteModel
 
             binding?.etPlaceName?.setText(placeData.placeName)
@@ -76,6 +83,57 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.btnSaveNote?.id ->
             {
                 Toast.makeText(this, "SUBMIT button clicked", Toast.LENGTH_SHORT).show()
+//testing
+                when{
+                    (binding?.etPlaceName?.text.isNullOrEmpty() ||
+                            binding?.etLatitude?.text.isNullOrEmpty() ||
+                            binding?.etLongitude?.text.isNullOrEmpty() ||
+                            binding?.etNote?.text.isNullOrEmpty()) -> {
+                        Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                    }
+                    //TODO: there's still a case when image is loaded from Places
+                    savedImagePath == null -> {
+                        Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show()
+                    }else ->{
+                    Log.d("debug", "starting to save to db")
+                    val dbNoteModel = dbNoteModel(
+                        "0",
+                        placeData.googlePlaceID,
+                        binding?.etPlaceName.toString(),
+                        binding?.etLatitude?.text.toString(),
+                        binding?.etLongitude?.text.toString(),
+                        Calendar.getInstance().time.toString(),
+                        binding?.etNote?.text.toString(),
+                        savedImagePath.toString(),
+                    )
+                    val dbHandler = DatabaseHandler(this)
+
+//testing this
+                    if (null == null){
+
+                        val addNote = dbHandler.addNote(dbNoteModel)
+                        Log.d("debug", "just saved to the db")
+                        if(addNote > 0){
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                    }else{
+                        setResult(Activity.RESULT_CANCELED)
+                        val updateHappyPlace = dbHandler.updateNote(dbNoteModel)
+
+                        if(updateHappyPlace > 0){
+
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                    }
+
+
+
+                }
+
+                }
+                //testing
             }
         }
     }
@@ -92,8 +150,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                         try {
                             val selectedImageBitmap = MediaStore.Images.Media
                                 .getBitmap(this.contentResolver, contentURI)
-                            //saveImageToInternalStorage = saveImageToInternalStorage(selectedImageBitmap)
-                            //Log.e("Saved image: ", "PAth :: $saveImageToInternalStorage")
+                            savedImagePath = saveImageToInternalStorage(selectedImageBitmap)
+                            Log.d("debug: ", "PAth :: $savedImagePath")
                             binding?.placePhoto?.setImageBitmap(selectedImageBitmap)
                         }catch (e: IOException){
                             e.printStackTrace()
@@ -106,8 +164,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 CAMERA -> {
                     val thumbnail : Bitmap = data!!.extras!!.get("data") as Bitmap
 
-                    //saveImageToInternalStorage = saveImageToInternalStorage(thumbnail)
-                    //Log.e("Saved image: ", "PAth :: $saveImageToInternalStorage")
+                    savedImagePath = saveImageToInternalStorage(thumbnail)
+                    Log.d("Saved image: ", "PAth :: $savedImagePath")
 
                     binding?.placePhoto?.setImageBitmap(thumbnail)
                 }
@@ -194,7 +252,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         private const val GALLERY = 1
         private const val CAMERA = 2
         private const val IMAGE_DIRECTORY = "LoconotesImages"
-        //private const val IMAGE_DIRECTORY = "HappyPlacesImages"
+
     }
 
 

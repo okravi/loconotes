@@ -7,8 +7,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
-import android.telephony.TelephonyCallback
-import com.okravi.loconotes.models.LocationNoteModel
+import com.okravi.loconotes.models.dbNoteModel
 
 
 class DatabaseHandler(context: Context) :
@@ -47,12 +46,12 @@ class DatabaseHandler(context: Context) :
         onCreate(db)
     }
 
-    fun addNote(note: LocationNoteModel): Long {
+    fun addNote(note: dbNoteModel): Long {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
-        contentValues.put(KEY_PLACE_PHOTO, note.photoMetadata)
+        contentValues.put(KEY_PLACE_PHOTO, note.photo)
         contentValues.put(KEY_NOTE, note.textNote)
         contentValues.put(KEY_DATE_MODIFIED, note.dateNoteLastModified)
         contentValues.put(KEY_PLACE_ID, note.googlePlaceID)
@@ -65,12 +64,12 @@ class DatabaseHandler(context: Context) :
         return result
     }
 
-    fun updateNote(note: LocationNoteModel): Int {
+    fun updateNote(note: dbNoteModel): Int {
         val db = this.writableDatabase
         val contentValues = ContentValues()
         contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
-        contentValues.put(KEY_PLACE_PHOTO, note.photoMetadata)
+        contentValues.put(KEY_PLACE_PHOTO, note.photo.toString())
         contentValues.put(KEY_NOTE, note.textNote)
         contentValues.put(KEY_DATE_MODIFIED, note.dateNoteLastModified)
         contentValues.put(KEY_PLACE_ID, note.googlePlaceID)
@@ -86,7 +85,7 @@ class DatabaseHandler(context: Context) :
         return success
     }
 
-    fun deleteNote(note: LocationNoteModel): Int {
+    fun deleteNote(note: dbNoteModel): Int {
         val db = this.writableDatabase
 
         val success = db.delete(
@@ -98,8 +97,8 @@ class DatabaseHandler(context: Context) :
     }
 
     @SuppressLint("Range")
-    fun getNotesList(): ArrayList<LocationNoteModel>{
-        val notesList = ArrayList<LocationNoteModel>()
+    fun getNotesList(): ArrayList<dbNoteModel>{
+        val notesList = ArrayList<dbNoteModel>()
         val selectQuery = "SELECT * FROM $TABLE_NOTES"
         val db = this.readableDatabase
 
@@ -108,22 +107,17 @@ class DatabaseHandler(context: Context) :
 
 
             if(cursor.moveToFirst()) do {
-                val place = LocationNoteModel(
+                val note = dbNoteModel(
                     cursor.getString(cursor.getColumnIndex(KEY_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_NAME)),
                     cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)),
                     cursor.getString(cursor.getColumnIndex(KEY_LONGITUDE)),
-                    0.0,
                     cursor.getString(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
                     cursor.getString(cursor.getColumnIndex(KEY_NOTE)),
-                    false,
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
-                    null,
-                    null
-
                 )
-                notesList.add(place)
+                notesList.add(note)
 
             }while (cursor.moveToNext())
             cursor.close()

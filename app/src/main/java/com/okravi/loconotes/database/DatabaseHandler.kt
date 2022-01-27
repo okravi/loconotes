@@ -18,11 +18,11 @@ class DatabaseHandler(context: Context) :
         private const val TABLE_NOTES = "NotesTable"
 
         private const val KEY_ID = "_id"
-        private const val KEY_PLACE_NAME = "place name"
-        private const val KEY_PLACE_PHOTO = "place photo"
-        private const val KEY_NOTE = "note text"
-        private const val KEY_DATE_MODIFIED = "last modified date"
-        private const val KEY_PLACE_ID = "google place id"
+        private const val KEY_PLACE_NAME = "place_name"
+        private const val KEY_PLACE_PHOTO = "place_photo"
+        private const val KEY_NOTE = "note_text"
+        private const val KEY_DATE_MODIFIED = "last_modified_date"
+        private const val KEY_PLACE_ID = "google_place_id"
         private const val KEY_LATITUDE = "latitude"
         private const val KEY_LONGITUDE = "longitude"
     }
@@ -30,7 +30,7 @@ class DatabaseHandler(context: Context) :
     override fun onCreate(db: SQLiteDatabase?) {
 
         val CREATE_NOTES_TABLE = ("CREATE TABLE " + TABLE_NOTES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY,"
+                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_PLACE_NAME + " TEXT,"
                 + KEY_PLACE_PHOTO + " TEXT,"
                 + KEY_NOTE + " TEXT,"
@@ -49,7 +49,7 @@ class DatabaseHandler(context: Context) :
     fun addNote(note: dbNoteModel): Long {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put(KEY_ID, note.keyID)
+        //contentValues.put(KEY_ID, null)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
         contentValues.put(KEY_PLACE_PHOTO, note.photo)
         contentValues.put(KEY_NOTE, note.textNote)
@@ -67,7 +67,7 @@ class DatabaseHandler(context: Context) :
     fun updateNote(note: dbNoteModel): Int {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put(KEY_ID, note.keyID)
+        //contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
         contentValues.put(KEY_PLACE_PHOTO, note.photo.toString())
         contentValues.put(KEY_NOTE, note.textNote)

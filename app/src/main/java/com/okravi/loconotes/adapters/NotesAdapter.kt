@@ -32,6 +32,8 @@ class NotesAdapter(
             holder.tvTextNote.text = model.textNote
             holder.ivNoteImage.setImageURI(model.photo.toUri())
             Log.e("debug", "we're binding each item to a view, image is ${model.photo}")
+            Log.e("debug", "we're binding each item to a view, title is ${model.placeName}")
+            Log.e("debug", "we're binding each item to a view, note text is ${model.textNote}")
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){

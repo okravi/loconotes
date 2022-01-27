@@ -95,11 +95,11 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     savedImagePath == null -> {
                         Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show()
                     }else ->{
-                    Log.d("debug", "starting to save to db")
+                    Log.d("debug", "starting to save to db, title is going to be ${binding?.etPlaceName.toString()}")
                     val dbNoteModel = dbNoteModel(
                         "0",
                         placeData.googlePlaceID,
-                        binding?.etPlaceName.toString(),
+                        binding?.etPlaceName?.text.toString(),
                         binding?.etLatitude?.text.toString(),
                         binding?.etLongitude?.text.toString(),
                         Calendar.getInstance().time.toString(),
@@ -112,7 +112,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     if (null == null){
 
                         val addNote = dbHandler.addNote(dbNoteModel)
-                        Log.d("debug", "just saved to the db")
+                        Log.d("debug", "just saved to the db, save result is $addNote")
                         if(addNote > 0){
                             setResult(Activity.RESULT_OK)
                             finish()

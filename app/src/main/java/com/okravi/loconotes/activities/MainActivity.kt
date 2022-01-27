@@ -6,8 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
@@ -16,11 +15,9 @@ import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.common.api.ApiException
@@ -44,15 +41,12 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.okravi.loconotes.R
 import com.okravi.loconotes.adapters.NearbyPlacesAdapter
 import com.okravi.loconotes.adapters.NotesAdapter
+import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
-import java.util.*
-//import android.R
-import android.content.res.Resources
-
-import android.graphics.Bitmap
 import com.okravi.loconotes.models.dbNoteModel
 import java.io.ByteArrayOutputStream
+import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -72,6 +66,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private lateinit var locationRequest: LocationRequest
     // This will store current location info
 
+    private var locationPermissionsOK = false
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 30
     private var nearbyPlacesInRecyclerView: Boolean = false
@@ -107,6 +102,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.translationX = 250F
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
+        //displaying saved notes
+        getNotesListFromLocalDB()
     }
 
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
@@ -142,7 +139,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     if (report!!.areAllPermissionsGranted()){
+                        Log.d("debug", "all permissions granted")
                         getFusedUserLocation()
+
                     }
                 }
 
@@ -181,6 +180,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Getting user location, we've already checked the permissions with Dexter
     @SuppressLint("MissingPermission")
     private fun getFusedUserLocation() {
+        locationPermissionsOK = true
         //Initialize fusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Initialize locationRequest.
@@ -237,24 +237,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
 
-        if (isLocationEnabled()) {
-
+        if (locationPermissionsOK) {
+            Log.d("debug", "locationPermissions:$locationPermissionsOK")
             mMap = googleMap
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
-        }
 
-        mMap.setOnMarkerClickListener { marker ->
-            if (marker.isInfoWindowShown) {
 
-                marker.hideInfoWindow()
-                Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT).show()
-            } else {
-                marker.showInfoWindow()
-                Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT).show()
+            mMap.setOnMarkerClickListener { marker ->
+                if (marker.isInfoWindowShown) {
+
+                    marker.hideInfoWindow()
+                    Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    marker.showInfoWindow()
+                    Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                true
             }
-            true
         }
     }
 
@@ -264,6 +267,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val mapFragment =
             supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
         mapFragment!!.getMapAsync(this)
+        Log.d("debug", "resuming")
+        getNotesListFromLocalDB()
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -438,7 +443,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onStart() {
         super.onStart()
 
-        if(isLocationEnabled()){
+        if(locationPermissionsOK){
             getFusedUserLocation()
             val mapFragment =
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
@@ -498,28 +503,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 newNote.googlePlaceID = listOfNearbyPlaces[position].googlePlaceID
                 newNote.placeLongitude = listOfNearbyPlaces[position].placeLongitude
                 newNote.placeLatitude = listOfNearbyPlaces[position].placeLatitude
-                //TODO: decode bitmap to make serializable work
 
-                /*
-
-
-I know where the problem is in your case and that is about the BitMap All you need to do is Decode your BitMap before sending into intent
-
-Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.thumbsup);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        largeIcon.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-
-And then send the following Object in intent
-
-intent.putExtras("remindermessage",object);
-
-and if not about the Bitmap then you should look for other things which might be taking more space and decode them before sending into intent
-
-                 */
-                //newNote.photo = listOfNearbyPlaces[position].photo
-
-                //testing
                 val stream = ByteArrayOutputStream()
                 listOfNearbyPlaces[position].photo?.compress(Bitmap.CompressFormat.PNG, 100, stream)
                 val byteArray: ByteArray = stream.toByteArray()
@@ -538,6 +522,32 @@ and if not about the Bitmap then you should look for other things which might be
         })
         nearbyPlacesInRecyclerView = true
         binding?.rvList?.scheduleLayoutAnimation()
+
+    }
+
+    private fun getNotesListFromLocalDB(){
+
+        val dbHandler = DatabaseHandler(this)
+        val notesList : ArrayList<dbNoteModel> = dbHandler.getNotesList()
+
+        if(notesList.size > 0){
+            /*
+            binding?.rvHappyPlacesList?.visibility = View.VISIBLE
+            binding?.tvNoRecordsAvailable?.visibility = View.GONE
+            setupHappyPlacesRecyclerView(getHappyPlaceList)
+
+             */
+
+            Log.d("debug", "notes in DB: ${notesList.size}")
+            setupNotesListRecyclerView(notesList)
+        }else {
+            /*
+            binding?.rvHappyPlacesList?.visibility = View.GONE
+            binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
+
+             */
+            Log.d("debug", "notes in DB: ${notesList.size}")
+        }
 
     }
 

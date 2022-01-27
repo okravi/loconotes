@@ -268,6 +268,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //in the onClick function
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
+        Log.d("debug", "getListOfLocationsForCurrentPosition/start" )
         var placesWithPhotosCounter = 0
         var bitmapsSavedCounter = 0
         var cycleCounter = 0
@@ -297,7 +298,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                 nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
 
                                 cycleCounter += 1
-
+                                Log.d("debug", "cyclecounter =$cycleCounter " )
                                 val photoMetadata = placeLikelihood.place
                                     .photoMetadatas?.first()
                                 if (photoMetadata != null){
@@ -356,11 +357,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
-
+                Log.d("debug", "clicked on add note" )
                 //making sure we don't display nearby items twice
                 listOfNearbyPlaces.clear()
 
                 if(isLocationEnabled()) {
+                    Log.d("debug", "location is enabled, proceeding" )
                     getListOfLocationsForCurrentPosition()
 
                 }else{

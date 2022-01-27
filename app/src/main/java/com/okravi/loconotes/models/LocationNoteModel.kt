@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import java.io.Serializable
 
 data class LocationNoteModel (
+    var keyID: String = "",
     var googlePlaceID: String = "",
     var placeName: String = "",
     var placeLatitude: String = "",

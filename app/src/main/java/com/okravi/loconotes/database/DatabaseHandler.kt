@@ -50,9 +50,9 @@ class DatabaseHandler(context: Context) :
     fun addNote(note: LocationNoteModel): Long {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-
+        contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
-        contentValues.put(KEY_PLACE_PHOTO, note.photoByteArray)
+        contentValues.put(KEY_PLACE_PHOTO, note.photoMetadata)
         contentValues.put(KEY_NOTE, note.textNote)
         contentValues.put(KEY_DATE_MODIFIED, note.dateNoteLastModified)
         contentValues.put(KEY_PLACE_ID, note.googlePlaceID)
@@ -68,9 +68,9 @@ class DatabaseHandler(context: Context) :
     fun updateNote(note: LocationNoteModel): Int {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-
+        contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
-        contentValues.put(KEY_PLACE_PHOTO, note.photoByteArray)
+        contentValues.put(KEY_PLACE_PHOTO, note.photoMetadata)
         contentValues.put(KEY_NOTE, note.textNote)
         contentValues.put(KEY_DATE_MODIFIED, note.dateNoteLastModified)
         contentValues.put(KEY_PLACE_ID, note.googlePlaceID)
@@ -80,7 +80,7 @@ class DatabaseHandler(context: Context) :
         val success = db.update(
             TABLE_NOTES,
             contentValues,
-            KEY_ID + "=" + note.id, null)
+            KEY_ID + "=" + note.keyID, null)
 
         db.close()
         return success
@@ -91,7 +91,7 @@ class DatabaseHandler(context: Context) :
 
         val success = db.delete(
             TABLE_NOTES,
-            KEY_ID + "=" + note.id, null)
+            KEY_ID + "=" + note.keyID, null)
 
         db.close()
         return success
@@ -109,6 +109,7 @@ class DatabaseHandler(context: Context) :
 
             if(cursor.moveToFirst()) do {
                 val place = LocationNoteModel(
+                    cursor.getString(cursor.getColumnIndex(KEY_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_NAME)),
                     cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)),
@@ -117,9 +118,10 @@ class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
                     cursor.getString(cursor.getColumnIndex(KEY_NOTE)),
                     false,
-                    "",
+                    cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                     null,
-                    cursor.get//BYTEARRAY!!!(cursor.getColumnIndex(KEY_PLACE_PHOTO))
+                    null
+
                 )
                 notesList.add(place)
 

@@ -169,7 +169,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                            _ ->
                 dialog.dismiss()
             }.show()
-
     }
 
     //Getting user location, we've already checked the permissions with Dexter
@@ -179,7 +178,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Initialize locationRequest.
         locationRequest = LocationRequest().apply {
-            //TODO: check if everything works OK and delete the commented out code
 
             // Sets the desired interval for
             // active location updates.
@@ -192,7 +190,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             // updates are delivered.
             maxWaitTime = 500
 
-
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallBack,
@@ -200,39 +197,28 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         )
     }
 
-    //testing a way to update user position on a map when he moves
-    var previousUserLocation : LatLng =  LatLng(-0.0, 0.0)
-    //testing
-    var alreadyZoomedIn: Boolean = false
-
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
-        //Zooming in only upon the app's start
-
 
         override fun onLocationResult(locationResult: LocationResult){
-            Log.i("debug", "we're in onLocationResult")
+
             currentLocation = locationResult.lastLocation
             val mLatitude = currentLocation!!.latitude
             val mLongitude = currentLocation!!.longitude
             //Zooming in on user's location
             val position = LatLng(mLatitude, mLongitude)
+            //animating camera only if the user did not change zoom level
+            val zoom: Float = mMap.cameraPosition.zoom
 
-            //TODO: see if we should check the alreadyZoomed in here as well
-            if ((position != previousUserLocation)){
-                Log.i("debug", "position changed")
+            if ((zoom == 18f)){
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
-                alreadyZoomedIn = true
                 mMap.animateCamera(newLatLngZoom)
             }
-
-            previousUserLocation = position
         }
     }
 
 
-    //Displaying users location on the map. Checking permissions with isLocationEnabled()
-
+    //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
 
@@ -246,11 +232,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
             mMap.setOnMarkerClickListener { marker ->
                 if (marker.isInfoWindowShown) {
-
                     marker.hideInfoWindow()
                     Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
                         .show()
-                } else {
+                }else{
                     marker.showInfoWindow()
                     Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
                         .show()
@@ -281,7 +266,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         //Client that exposes the Places API methods
         val placesClient = Places.createClient(this)
         // Use fields to define the data types to return.
-        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
+        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG,
+            Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
         // Use the builder to create a FindCurrentPlaceRequest.
         val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
         // Call findCurrentPlace and handle the response (first check that the user has granted permission).
@@ -292,19 +278,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
-                        //Saving top probability places to the list if they have photos
+                        //Going through $maxNumberOfNearbyPlacesToShowUser and saving if they have photos
                         when {
                             cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
 
                                 val nearbyLocation = LocationNoteModel()
                                 nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
                                 nearbyLocation.placeName = placeLikelihood.place.name!!
-                                nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!.latitude.toString()
-                                nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!.longitude.toString()
+                                nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!
+                                    .latitude.toString()
+                                nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!
+                                    .longitude.toString()
                                 nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
 
                                 cycleCounter += 1
-                                Log.d("debug", "cyclecounter =$cycleCounter " )
+
                                 val photoMetadata = placeLikelihood.place
                                     .photoMetadatas?.first()
                                 if (photoMetadata != null){
@@ -355,7 +343,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
             }
 
-
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         return listOfNearbyPlaces
     }
@@ -374,7 +361,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }else{
                     Toast.makeText(this, "Please grant the location permission!", Toast.LENGTH_SHORT).show()
                 }
-
             }
 
             binding?.btnListNotes?.id -> {
@@ -391,8 +377,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 Toast.makeText(this, "Settings button clicked", Toast.LENGTH_SHORT).show()
             }
         }
-
-
     }
 
     private fun getSavedNotesFromDB(): ArrayList<dbNoteModel>{
@@ -412,7 +396,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     .position(markerPosition)
                     .title(listOfSavedNotes[i].placeName)
             )
-            //TODO: change the tag from Google Place ID to a unique DB identifier
             marker?.tag = listOfSavedNotes[i].googlePlaceID
             marker?.snippet = listOfSavedNotes[i].textNote
         }
@@ -431,7 +414,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
-
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
@@ -439,6 +421,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
+    //TODO: check if this is actually working
     override fun onStart() {
         super.onStart()
 
@@ -455,46 +438,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
 
-        Log.d("debug", "Adding places: ${nearbyPlaceList.size}, already in view ${nearbyPlacesAdapter.itemCount} ")
-
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
 
-
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
                 Toast.makeText(this@MainActivity, "clicked on a place", Toast.LENGTH_SHORT).show()
 
-                /*
-                val inputEditTextField = EditText(this@MainActivity)
-                val dialog = AlertDialog.Builder(this@MainActivity)
-                    .setTitle("")
-                    .setMessage("Please add a note for: ${listOfNearbyPlaces[position].placeName}")
-                    .setView(inputEditTextField)
-                    .setPositiveButton("OK") { _, _ ->
-                        val newNote = LocationNoteModel()
-                        val editTextInput = inputEditTextField.text.toString()
-                        newNote.textNote = editTextInput
-                        newNote.placeName = listOfNearbyPlaces[position].placeName
-                        newNote.googlePlaceID = listOfNearbyPlaces[position].googlePlaceID
-                        newNote.placeLongitude = listOfNearbyPlaces[position].placeLongitude
-                        newNote.placeLatitude = listOfNearbyPlaces[position].placeLatitude
-                        newNote.photo = listOfNearbyPlaces[position].photo
-                        listOfSavedNotes.add(newNote)
-
-                        Log.d("debug", "Size of listOfSavedNotes:${listOfSavedNotes[listOfSavedNotes.size-1]}, ${editTextInput}")
-
-                        //displaying the whole list of notes after adding new one
-                        setupNotesListRecyclerView(listOfSavedNotes)
-                    }
-                    .setNegativeButton("Cancel", null)
-                    .create()
-                dialog.show()
-
-                 */
                 val newNote = LocationNoteModel()
 
                 newNote.textNote = ""
@@ -507,11 +460,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 listOfNearbyPlaces[position].photo?.compress(Bitmap.CompressFormat.PNG, 100, stream)
                 val byteArray: ByteArray = stream.toByteArray()
 
-                //val in1 = Intent(this, Activity2::class.java)
-                //in1.putExtra("image", byteArray)
-                //newNote.photo = BitmapFactory.decodeResource(getResources(), listOfNearbyPlaces[position].photo)
-                //testing
-
                 newNote.photoByteArray = byteArray
 
                 val intent = Intent(this@MainActivity, NoteEditActivity::class.java)
@@ -521,7 +469,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         })
         nearbyPlacesInRecyclerView = true
         binding?.rvList?.scheduleLayoutAnimation()
-
     }
 
     private fun getNotesListFromLocalDB(){
@@ -530,24 +477,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val notesList : ArrayList<dbNoteModel> = dbHandler.getNotesList()
 
         if(notesList.size > 0){
-            /*
-            binding?.rvHappyPlacesList?.visibility = View.VISIBLE
-            binding?.tvNoRecordsAvailable?.visibility = View.GONE
-            setupHappyPlacesRecyclerView(getHappyPlaceList)
-
-             */
-
-            Log.d("debug", "notes in DB: ${notesList.size}")
             setupNotesListRecyclerView(notesList)
         }else {
-            /*
-            binding?.rvHappyPlacesList?.visibility = View.GONE
-            binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
-
-             */
-            Log.d("debug", "notes in DB: ${notesList.size}")
+            return
         }
-
     }
 
     companion object {

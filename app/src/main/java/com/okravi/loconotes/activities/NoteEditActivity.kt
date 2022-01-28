@@ -32,13 +32,13 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.*
 
-
 private var binding : ActivityNoteEditBinding? = null
 
 class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
     private var savedImagePath : Uri? = null
     private lateinit var placeData: LocationNoteModel
+    private lateinit var bmp: Bitmap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +47,6 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding?.root)
 
         //getting place data based on the clicked recyclerview position
-
-
         if(intent.hasExtra(MainActivity.PLACE_DATA)){
             placeData = intent.getSerializableExtra(
                 MainActivity.PLACE_DATA) as LocationNoteModel
@@ -58,14 +56,12 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etLongitude?.setText(placeData.placeLongitude)
 
             val byteArray = placeData.photoByteArray
-            val bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+            bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
 
             binding?.placePhoto?.setImageBitmap(bmp)
             binding?.btnLoadPicture?.setOnClickListener(this)
             binding?.btnTakePhoto?.setOnClickListener(this)
             binding?.btnSaveNote?.setOnClickListener(this)
-
-
         }
     }
 
@@ -82,20 +78,20 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             }
             binding?.btnSaveNote?.id ->
             {
-                Toast.makeText(this, "SUBMIT button clicked", Toast.LENGTH_SHORT).show()
-//testing
-                when{
-                    (binding?.etPlaceName?.text.isNullOrEmpty() ||
+                //if some fields are not filled show toast
+                if ((binding?.etPlaceName?.text.isNullOrEmpty() ||
                             binding?.etLatitude?.text.isNullOrEmpty() ||
                             binding?.etLongitude?.text.isNullOrEmpty() ||
-                            binding?.etNote?.text.isNullOrEmpty()) -> {
-                        Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                            binding?.etNote?.text.isNullOrEmpty())
+                ) {
+                    Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                }
+                else {
+                    if(savedImagePath == null){
+                        //saving Places image if user did not choose an alternative
+                        savedImagePath = saveImageToInternalStorage(bmp)
                     }
-                    //TODO: there's still a case when image is loaded from Places
-                    savedImagePath == null -> {
-                        Toast.makeText(this, "Please select an image", Toast.LENGTH_SHORT).show()
-                    }else ->{
-                    Log.d("debug", "starting to save to db, title is going to be ${binding?.etPlaceName.toString()}")
+                    //saving note to the db
                     val dbNoteModel = dbNoteModel(
                         "0",
                         placeData.googlePlaceID,
@@ -108,7 +104,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     )
                     val dbHandler = DatabaseHandler(this)
 
-//testing this
+                    //TODO: add a ?update/create condition below
                     if (null == null){
 
                         val addNote = dbHandler.addNote(dbNoteModel)
@@ -119,21 +115,14 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                         }
                     }else{
                         setResult(Activity.RESULT_CANCELED)
-                        val updateHappyPlace = dbHandler.updateNote(dbNoteModel)
+                        val updateNote = dbHandler.updateNote(dbNoteModel)
 
-                        if(updateHappyPlace > 0){
-
+                        if(updateNote > 0){
                             setResult(Activity.RESULT_OK)
                             finish()
                         }
                     }
-
-
-
                 }
-
-                }
-                //testing
             }
         }
     }
@@ -142,17 +131,16 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK){
             when (requestCode) {
-                //displaying the selected image
+                //displaying locally stored image choen by user
                 GALLERY -> {
                     if(data != null){
                         val contentURI = data.data
-                        val testURI = data.extras
+
                         try {
-                            val selectedImageBitmap = MediaStore.Images.Media
+                            bmp = MediaStore.Images.Media
                                 .getBitmap(this.contentResolver, contentURI)
-                            savedImagePath = saveImageToInternalStorage(selectedImageBitmap)
-                            Log.d("debug: ", "PAth :: $savedImagePath")
-                            binding?.placePhoto?.setImageBitmap(selectedImageBitmap)
+                            savedImagePath = saveImageToInternalStorage(bmp)
+                            binding?.placePhoto?.setImageBitmap(bmp)
                         }catch (e: IOException){
                             e.printStackTrace()
                             Toast.makeText(this, "Failed to load the image",
@@ -160,14 +148,11 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                         }
                     }
                 }
-
+                //displaying photo taken by camera
                 CAMERA -> {
-                    val thumbnail : Bitmap = data!!.extras!!.get("data") as Bitmap
-
-                    savedImagePath = saveImageToInternalStorage(thumbnail)
-                    Log.d("Saved image: ", "PAth :: $savedImagePath")
-
-                    binding?.placePhoto?.setImageBitmap(thumbnail)
+                   bmp = data!!.extras!!.get("data") as Bitmap
+                    savedImagePath = saveImageToInternalStorage(bmp)
+                    binding?.placePhoto?.setImageBitmap(bmp)
                 }
             }
         }
@@ -252,9 +237,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         private const val GALLERY = 1
         private const val CAMERA = 2
         private const val IMAGE_DIRECTORY = "LoconotesImages"
-
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

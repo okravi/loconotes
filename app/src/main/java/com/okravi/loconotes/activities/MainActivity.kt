@@ -49,28 +49,25 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
-
 private var binding : ActivityMainBinding? = null
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
     //GoogleMaps class for map manipulation
     private lateinit var mMap: GoogleMap
     // FusedLocationProviderClient - Main class for receiving location updates.
-
-    //testing
-    private lateinit var nearbyPlacesAdapter : NearbyPlacesAdapter
-    //testing
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     // LocationRequest - Requirements for the location updates, i.e.,
     // how often you should receive updates, the priority, etc.
     private lateinit var locationRequest: LocationRequest
     // This will store current location info
-
     private var locationPermissionsOK = false
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 30
     private var nearbyPlacesInRecyclerView: Boolean = false
+    //creating empty list of places
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
+    //creating empty list of notes to load to from the db
+    var listOfSavedNotes = ArrayList<dbNoteModel>(5)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,9 +103,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         getNotesListFromLocalDB()
     }
 
-    var listOfSavedNotes = ArrayList<dbNoteModel>(5)
 
-    //Checking if location provider is enabled for all apps
+    //Checking if location service is enabled on the device
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
             getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -116,22 +112,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    //Checking whether user granted the location permissions
+    //Checking whether user granted the location permissions for the app
     private fun checkLocationPermissionsWithDexter() {
 
         if (!isLocationEnabled()) {
 
             Toast.makeText(
                 this,
-                "Your location provider is turned off. Please turn it on.",
+                "The location service is disabled on the device. Please turn it on.",
                 Toast.LENGTH_SHORT
             ).show()
 
-            // This will redirect you to settings from where you need to turn on the location provider.
+            // This redirects to settings where user needs to turn on the location provider
             val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
             startActivity(intent)
         } else {
-
+            //Checking location permissions for the app
             Dexter.withActivity(this).withPermissions(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -139,9 +135,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     if (report!!.areAllPermissionsGranted()){
-                        Log.d("debug", "all permissions granted")
+                        locationPermissionsOK = true
+                        //getting user location
                         getFusedUserLocation()
-
                     }
                 }
 
@@ -152,13 +148,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     showRationaleDialogForPermissions()
                 }
             }).onSameThread().check()
-
         }
     }
 
     private fun showRationaleDialogForPermissions() {
         AlertDialog.Builder(this)
-            .setMessage("It looks like the permissions weren't granted. That's unfortunate.")
+            .setMessage("It looks like the location permissions weren't granted.")
             .setPositiveButton("GO TO SETTINGS")
             { _, _ ->
                 try {
@@ -180,11 +175,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Getting user location, we've already checked the permissions with Dexter
     @SuppressLint("MissingPermission")
     private fun getFusedUserLocation() {
-        locationPermissionsOK = true
         //Initialize fusedLocationProviderClient
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         //Initialize locationRequest.
         locationRequest = LocationRequest().apply {
+            //TODO: check if everything works OK and delete the commented out code
+
             // Sets the desired interval for
             // active location updates.
             interval = 60000
@@ -196,6 +192,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             // updates are delivered.
             maxWaitTime = 500
 
+
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallBack,
@@ -203,17 +200,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         )
     }
 
-    //testing
+    //testing a way to update user position on a map when he moves
     var previousUserLocation : LatLng =  LatLng(-0.0, 0.0)
     //testing
+    var alreadyZoomedIn: Boolean = false
 
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
         //Zooming in only upon the app's start
-        var alreadyZoomedIn: Boolean = false
+
 
         override fun onLocationResult(locationResult: LocationResult){
-            //val mLastLocation: Location = locationResult.lastLocation
+            Log.i("debug", "we're in onLocationResult")
             currentLocation = locationResult.lastLocation
             val mLatitude = currentLocation!!.latitude
             val mLongitude = currentLocation!!.longitude
@@ -222,6 +220,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
             //TODO: see if we should check the alreadyZoomed in here as well
             if ((position != previousUserLocation)){
+                Log.i("debug", "position changed")
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
                 alreadyZoomedIn = true
                 mMap.animateCamera(newLatLngZoom)

@@ -199,20 +199,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
+        var initialCameraZoomIn: Boolean = true
 
         override fun onLocationResult(locationResult: LocationResult){
 
             currentLocation = locationResult.lastLocation
             val mLatitude = currentLocation!!.latitude
             val mLongitude = currentLocation!!.longitude
-            //Zooming in on user's location
             val position = LatLng(mLatitude, mLongitude)
+            //Zooming in on user's location
             //animating camera only if the user did not change zoom level
             val zoom: Float = mMap.cameraPosition.zoom
-
-            if ((zoom == 18f)){
+            //not zooming in if user zoomed in/out manually
+            if ((zoom == 18f) || initialCameraZoomIn){
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
                 mMap.animateCamera(newLatLngZoom)
+                initialCameraZoomIn = false
             }
         }
     }

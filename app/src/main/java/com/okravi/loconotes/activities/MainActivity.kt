@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
@@ -45,6 +46,7 @@ import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
+import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
@@ -100,7 +102,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
         //displaying saved notes
-        getNotesListFromLocalDB()
+        //getNotesListFromLocalDB()
     }
 
 
@@ -223,13 +225,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-
+        Log.d("markers", "were in onMapReady")
         if (locationPermissionsOK) {
+            Log.d("markers", "were in onMapReady by the location perms are OK")
             Log.d("debug", "locationPermissions:$locationPermissionsOK")
             mMap = googleMap
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
+            //TODO: only show markers here, don't read the whole DB
+            getNotesListFromLocalDB()
 
 
             mMap.setOnMarkerClickListener { marker ->
@@ -244,6 +249,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
                 true
             }
+        }else{
+            Log.d("markers", "were in onMapReady by the location perms are off")
         }
     }
 
@@ -254,7 +261,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
         mapFragment!!.getMapAsync(this)
         Log.d("debug", "resuming")
-        getNotesListFromLocalDB()
+        //getNotesListFromLocalDB()
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -372,6 +379,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     setupNotesListRecyclerView(listOfSavedNotes)
                 }else{
                     Toast.makeText(this, "No notes saved!", Toast.LENGTH_SHORT).show()
+                    //TODO fix the this logic, it's for testing only
+                    getNotesListFromLocalDB()
                 }
             }
 
@@ -381,18 +390,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
-    private fun getSavedNotesFromDB(): ArrayList<dbNoteModel>{
-        //TODO this is to be done on 28/01
-        return listOfSavedNotes
-    }
-
     private fun displaySavedNotesMarkersOnMap() {
 
         //displaying locations of saved notes on a map
-        for (i in 0 until listOfSavedNotes.size) {
+        Log.d("markers frm database", listOfSavedNotes.size.toString())
 
-            val markerPosition = LatLng(listOfNearbyPlaces[i].placeLatitude.toDouble(),
-                listOfNearbyPlaces[i].placeLongitude.toDouble())
+        for (i in 0 until listOfSavedNotes.size) {
+            Log.d("setting up marker #", i.toString())
+            val markerPosition = LatLng(listOfSavedNotes[i].placeLatitude.toDouble(),
+                listOfSavedNotes[i].placeLongitude.toDouble())
+            Log.d("marker pos", "$markerPosition")
             val marker = mMap.addMarker(
                 MarkerOptions()
                     .position(markerPosition)
@@ -400,13 +407,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             )
             marker?.tag = listOfSavedNotes[i].googlePlaceID
             marker?.snippet = listOfSavedNotes[i].textNote
+
         }
+
+
     }
 
     private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
 
         binding?.rvList?.layoutManager = LinearLayoutManager(this@MainActivity)
-        val notesAdapter = NotesAdapter(items = notesList)
+        val notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = notesAdapter
 
@@ -415,11 +425,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-                Toast.makeText(this@MainActivity, "clicked on a NOTE", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "clicked on a NOTE ${notesList[position].keyID}", Toast.LENGTH_SHORT).show()
+
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
         displaySavedNotesMarkersOnMap()
+
+        val editSwipeHandler = object: SwipeToEditCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                //TODO: simplify this
+                val adapter = notesAdapter as NotesAdapter
+                adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
+            }
+        }
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
@@ -476,10 +495,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun getNotesListFromLocalDB(){
 
         val dbHandler = DatabaseHandler(this)
-        val notesList : ArrayList<dbNoteModel> = dbHandler.getNotesList()
+        val notesListTester : ArrayList<dbNoteModel> = dbHandler.getNotesList()
+        Log.d("RCVD database:", notesListTester.size.toString())
+        // = dbHandler.getNotesList()
 
-        if(notesList.size > 0){
-            setupNotesListRecyclerView(notesList)
+        if(notesListTester.size > 0){
+            listOfSavedNotes = notesListTester
+            setupNotesListRecyclerView(listOfSavedNotes)
         }else {
             return
         }
@@ -487,6 +509,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     companion object {
         var PLACE_DATA = "place_data"
+        var NOTE_EDIT_ACTIVITY_REQUEST_CODE = 1
     }
 
 

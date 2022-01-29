@@ -1,20 +1,26 @@
 package com.okravi.loconotes.adapters
 
+import android.app.Activity
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.okravi.loconotes.activities.NoteEditActivity
 import com.okravi.loconotes.databinding.ItemNoteBinding
 import com.okravi.loconotes.models.dbNoteModel
+import android.content.Context
+import com.okravi.loconotes.activities.MainActivity
 
 
-class NotesAdapter(
+open class NotesAdapter(
+    private val context: Context,
     private val items: ArrayList<dbNoteModel>
 ):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var onClickRecyclerListener: OnClickListener? = null
+    private var onClickRecyclerListener: OnClickListener? = null
 
     //inflate items
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -31,14 +37,10 @@ class NotesAdapter(
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote
             holder.ivNoteImage.setImageURI(model.photo.toUri())
-            Log.e("debug", "we're binding each item to a view, image is ${model.photo}")
-            Log.e("debug", "we're binding each item to a view, title is ${model.placeName}")
-            Log.e("debug", "we're binding each item to a view, note text is ${model.textNote}")
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
 
-                    //TODO: (it) might not be right here
                     onClickRecyclerListener!!.onClick(position, model)
                 }
             }
@@ -47,6 +49,14 @@ class NotesAdapter(
 
     fun setOnClickListener(onClickRecyclerListener: OnClickListener){
         this.onClickRecyclerListener = onClickRecyclerListener
+    }
+
+    //notify adapter that this item is going to be changed
+    fun notifyEditItem(activity: Activity, position: Int, requestCode: Int){
+        val intent = Intent(context, NoteEditActivity::class.java)
+        intent.putExtra(MainActivity.PLACE_DATA, items[position])
+        activity.startActivityForResult(intent, requestCode)
+        notifyItemChanged(position)
     }
 
     override fun getItemCount(): Int {

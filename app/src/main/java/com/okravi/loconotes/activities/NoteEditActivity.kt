@@ -37,6 +37,7 @@ private var binding : ActivityNoteEditBinding? = null
 class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
     private var savedImagePath : Uri? = null
+    private var noteDetails: dbNoteModel? = null
     private lateinit var placeData: LocationNoteModel
     private lateinit var bmp: Bitmap
 

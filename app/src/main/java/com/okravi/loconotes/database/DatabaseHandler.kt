@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
+import android.util.Log
 import com.okravi.loconotes.models.dbNoteModel
 
 
@@ -69,7 +70,7 @@ class DatabaseHandler(context: Context) :
         val contentValues = ContentValues()
         //contentValues.put(KEY_ID, note.keyID)
         contentValues.put(KEY_PLACE_NAME, note.placeName)
-        contentValues.put(KEY_PLACE_PHOTO, note.photo.toString())
+        contentValues.put(KEY_PLACE_PHOTO, note.photo)
         contentValues.put(KEY_NOTE, note.textNote)
         contentValues.put(KEY_DATE_MODIFIED, note.dateNoteLastModified)
         contentValues.put(KEY_PLACE_ID, note.googlePlaceID)
@@ -101,12 +102,14 @@ class DatabaseHandler(context: Context) :
         val notesList = ArrayList<dbNoteModel>()
         val selectQuery = "SELECT * FROM $TABLE_NOTES"
         val db = this.readableDatabase
+        var databaseReadCycles = 1
 
         try{
             val cursor  : Cursor = db.rawQuery(selectQuery, null)
 
 
             if(cursor.moveToFirst()) do {
+                Log.d("database read cycle:", databaseReadCycles.toString())
                 val note = dbNoteModel(
                     cursor.getString(cursor.getColumnIndex(KEY_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
@@ -118,16 +121,26 @@ class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                 )
                 notesList.add(note)
+                Log.d("reading database item:", note.placeName)
+                Log.d("itms in nlist database:", notesList.size.toString())
+
+                databaseReadCycles += 1
 
             }while (cursor.moveToNext())
             cursor.close()
 
         }catch (e:SQLiteException){
             db.execSQL(selectQuery)
+            Log.d("excp database:", "caought exception")
             return ArrayList()
         }
 
+        Log.d("database items read:", {notesList.size.toString()}.toString())
+        Log.d("FINAL database:", notesList.size.toString())
+
+        db.close()
         return notesList
+
     }
 
 }

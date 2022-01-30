@@ -54,7 +54,7 @@ open class NotesAdapter(
     //notify adapter that this item is going to be changed
     fun notifyEditItem(activity: Activity, position: Int, requestCode: Int){
         val intent = Intent(context, NoteEditActivity::class.java)
-        intent.putExtra(MainActivity.PLACE_DATA, items[position])
+        intent.putExtra(MainActivity.NOTE_DATA, items[position])
         activity.startActivityForResult(intent, requestCode)
         notifyItemChanged(position)
     }

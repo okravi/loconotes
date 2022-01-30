@@ -17,6 +17,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -37,9 +38,11 @@ private var binding : ActivityNoteEditBinding? = null
 class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
     private var savedImagePath : Uri? = null
-    private var noteDetails: dbNoteModel? = null
+    private lateinit var noteData: dbNoteModel
     private lateinit var placeData: LocationNoteModel
     private lateinit var bmp: Bitmap
+    private var creatingNewNote: Boolean = false
+    private lateinit var notesListTester : ArrayList<dbNoteModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,22 +50,40 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         binding = ActivityNoteEditBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        binding?.btnLoadPicture?.setOnClickListener(this)
+        binding?.btnTakePhoto?.setOnClickListener(this)
+        binding?.btnSaveNote?.setOnClickListener(this)
+
         //getting place data based on the clicked recyclerview position
         if(intent.hasExtra(MainActivity.PLACE_DATA)){
+            creatingNewNote = true
             placeData = intent.getSerializableExtra(
                 MainActivity.PLACE_DATA) as LocationNoteModel
 
+            //displaying place data sent from MainActivity
             binding?.etPlaceName?.setText(placeData.placeName)
             binding?.etLatitude?.setText(placeData.placeLatitude)
             binding?.etLongitude?.setText(placeData.placeLongitude)
-
             val byteArray = placeData.photoByteArray
             bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
-
             binding?.placePhoto?.setImageBitmap(bmp)
-            binding?.btnLoadPicture?.setOnClickListener(this)
-            binding?.btnTakePhoto?.setOnClickListener(this)
-            binding?.btnSaveNote?.setOnClickListener(this)
+        }
+        //getting note data based on the swiped recyclerview position
+        if(intent.hasExtra(MainActivity.NOTE_DATA)) {
+            noteData = intent.getSerializableExtra(
+                MainActivity.NOTE_DATA
+            ) as dbNoteModel
+
+            //Reading note from DB based on keyID
+            val dbHandler = DatabaseHandler(this)
+            notesListTester = dbHandler.getNote(noteData.keyID.toInt())
+
+            //Displaying Note
+            binding?.etPlaceName?.setText(notesListTester[0].placeName)
+            binding?.etLatitude?.setText(notesListTester[0].placeLatitude)
+            binding?.etLongitude?.setText(notesListTester[0].placeLongitude)
+            binding?.etNote?.setText(notesListTester[0].textNote)
+            binding?.placePhoto?.setImageURI(notesListTester[0].photo.toUri())
         }
     }
 
@@ -94,7 +115,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     //saving note to the db
                     val dbNoteModel = dbNoteModel(
-                        "0",
+                        (if(creatingNewNote) 0 else {notesListTester[0].keyID}) as String,
                         placeData.googlePlaceID,
                         binding?.etPlaceName?.text.toString(),
                         binding?.etLatitude?.text.toString(),
@@ -105,8 +126,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     )
                     val dbHandler = DatabaseHandler(this)
 
-                    //TODO: add a ?update/create condition below
-                    if (null == null){
+                    //TODO: updating functionality not checked yet!
+                    if (creatingNewNote){
 
                         val addNote = dbHandler.addNote(dbNoteModel)
                         Log.d("debug", "just saved to the db, save result is $addNote")

@@ -18,6 +18,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -434,11 +435,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         val editSwipeHandler = object: SwipeToEditCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                //TODO: simplify this
-                val adapter = notesAdapter as NotesAdapter
+                val adapter = binding?.rvList?.adapter as NotesAdapter
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
             }
         }
+
+        val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
+        editItemTouchHandler.attachToRecyclerView(binding?.rvList)
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
@@ -509,6 +512,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     companion object {
         var PLACE_DATA = "place_data"
+        var NOTE_DATA = "note_data"
         var NOTE_EDIT_ACTIVITY_REQUEST_CODE = 1
     }
 

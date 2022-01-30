@@ -8,10 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.util.Log
+import androidx.lifecycle.LiveData
 import com.okravi.loconotes.models.dbNoteModel
 
 
-class DatabaseHandler(context: Context) :
+open class DatabaseHandler(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         private const val DATABASE_VERSION = 1
@@ -97,11 +98,14 @@ class DatabaseHandler(context: Context) :
         return success
     }
 
+
+
     @SuppressLint("Range")
-    fun getNotesList(): ArrayList<dbNoteModel>{
+    fun getNote(keyID: Int): ArrayList<dbNoteModel>{
         val notesList = ArrayList<dbNoteModel>()
-        val selectQuery = "SELECT * FROM $TABLE_NOTES"
+        val selectQuery = "SELECT * FROM $TABLE_NOTES WHERE $KEY_ID = $keyID"
         val db = this.readableDatabase
+
         var databaseReadCycles = 1
 
         try{
@@ -131,7 +135,57 @@ class DatabaseHandler(context: Context) :
 
         }catch (e:SQLiteException){
             db.execSQL(selectQuery)
-            Log.d("excp database:", "caought exception")
+            Log.d("excp database:", "caught exception")
+            return ArrayList()
+        }
+
+        Log.d("database items read:", {notesList.size.toString()}.toString())
+        Log.d("FINAL database:", notesList.size.toString())
+
+        db.close()
+        return notesList
+
+    }
+
+
+
+
+    @SuppressLint("Range")
+    fun getNotesList(): ArrayList<dbNoteModel>{
+        val notesList = ArrayList<dbNoteModel>()
+        val selectQuery = "SELECT * FROM $TABLE_NOTES"
+        val db = this.readableDatabase
+
+        var databaseReadCycles = 1
+
+        try{
+            val cursor  : Cursor = db.rawQuery(selectQuery, null)
+
+
+            if(cursor.moveToFirst()) do {
+                Log.d("database read cycle:", databaseReadCycles.toString())
+                val note = dbNoteModel(
+                    cursor.getString(cursor.getColumnIndex(KEY_ID)),
+                    cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
+                    cursor.getString(cursor.getColumnIndex(KEY_PLACE_NAME)),
+                    cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)),
+                    cursor.getString(cursor.getColumnIndex(KEY_LONGITUDE)),
+                    cursor.getString(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
+                    cursor.getString(cursor.getColumnIndex(KEY_NOTE)),
+                    cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
+                )
+                notesList.add(note)
+                Log.d("reading database item:", note.placeName)
+                Log.d("itms in nlist database:", notesList.size.toString())
+
+                databaseReadCycles += 1
+
+            }while (cursor.moveToNext())
+            cursor.close()
+
+        }catch (e:SQLiteException){
+            db.execSQL(selectQuery)
+            Log.d("excp database:", "caught exception")
             return ArrayList()
         }
 

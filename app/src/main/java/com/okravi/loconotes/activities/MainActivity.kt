@@ -47,6 +47,7 @@ import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
+import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -442,6 +443,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
+
+        //testing
+        val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = binding?.rvList?.adapter as NotesAdapter
+                adapter.removeAt(viewHolder.adapterPosition)
+            }
+        }
+
+        val deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
+        deleteItemTouchHandler.attachToRecyclerView(binding?.rvList)
+        //testing
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions

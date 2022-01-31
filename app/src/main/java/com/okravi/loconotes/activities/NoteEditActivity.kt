@@ -119,8 +119,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     //saving note to the db
                     val dbNoteModel = dbNoteModel(
-                        (if(creatingNewNote) 0 else {noteFromDB[0].keyID}) as String,
-                        (if(creatingNewNote) placeData.googlePlaceID else {noteFromDB[0].googlePlaceID}),
+                        (if(creatingNewNote) "0" else {noteFromDB[0].keyID}) as String,
+                        (if(creatingNewNote) placeData.googlePlaceID else noteFromDB[0].googlePlaceID),
                         binding?.etPlaceName?.text.toString(),
                         binding?.etLatitude?.text.toString(),
                         binding?.etLongitude?.text.toString(),

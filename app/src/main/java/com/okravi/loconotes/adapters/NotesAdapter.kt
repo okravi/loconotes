@@ -12,7 +12,7 @@ import com.okravi.loconotes.databinding.ItemNoteBinding
 import com.okravi.loconotes.models.dbNoteModel
 import android.content.Context
 import com.okravi.loconotes.activities.MainActivity
-
+import com.okravi.loconotes.database.DatabaseHandler
 
 open class NotesAdapter(
     private val context: Context,
@@ -49,6 +49,15 @@ open class NotesAdapter(
 
     fun setOnClickListener(onClickRecyclerListener: OnClickListener){
         this.onClickRecyclerListener = onClickRecyclerListener
+    }
+
+    fun removeAt(adapterPosition: Int) {
+        val dbHandler = DatabaseHandler(context)
+        val isDeleted = dbHandler.deleteNote(items[adapterPosition])
+        if(isDeleted > 0){
+            items.removeAt(adapterPosition)
+            notifyItemRemoved(adapterPosition)
+        }
     }
 
     //notify adapter that this item is going to be changed

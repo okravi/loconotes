@@ -21,10 +21,9 @@ open class NotesAdapter(
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var onClickRecyclerListener: OnClickListener? = null
-
     //inflate items
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Log.e("debug", "we're in onCreateViewHolder")
+
         return MyViewHolder(ItemNoteBinding.inflate(
             LayoutInflater.from(parent.context), parent, false))
     }
@@ -32,7 +31,7 @@ open class NotesAdapter(
     //binding each item to a view
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = items[position]
-        Log.e("debug", "we're in onBindViewHolder")
+
         if (holder is MyViewHolder) {
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote

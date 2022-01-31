@@ -19,7 +19,7 @@ class NearbyPlacesAdapter(
 
     //inflate items
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        Log.e("debug", "we're in onCreateViewHolder")
+
         return MyViewHolder(ItemNearbyPlaceBinding.inflate(
             LayoutInflater.from(parent.context), parent, false))
     }
@@ -27,10 +27,9 @@ class NearbyPlacesAdapter(
     //binding each item to a view
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = items[position]
-        Log.e("debug", "we're in onBindViewHolder")
+
         if (holder is MyViewHolder) {
             holder.tvNearbyPlaceName.text = model.placeName
-            Log.e("debug", "we're binding each item to a view")
 
             if(model.photo != null){
                 holder.ivNearbyPlacePhoto.setImageBitmap(model.photo)
@@ -61,7 +60,6 @@ class NearbyPlacesAdapter(
 
     interface OnClickListener{
         fun onClick(position: Int, model: LocationNoteModel)
-
     }
     //describe item view and metadata about its place within the RecyclerView
     private class MyViewHolder(binding: ItemNearbyPlaceBinding):
@@ -69,9 +67,7 @@ class NearbyPlacesAdapter(
 
         var tvNearbyPlaceName = binding.tvNearbyPlaceName
         var ivNearbyPlacePhoto = binding.ivNearbyPlacePhoto
-
     }
-
 }
 
 

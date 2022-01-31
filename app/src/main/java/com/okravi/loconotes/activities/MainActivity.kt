@@ -444,17 +444,26 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
 
-        //testing
+
         val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = binding?.rvList?.adapter as NotesAdapter
                 adapter.removeAt(viewHolder.adapterPosition)
+
+                Log.d("debug", "items in view ${adapter.itemCount}")
+                //showing "No records available" if the last note is deleted
+                if (adapter.itemCount < 1 ){
+                    binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
+                    binding?.rvList?.visibility = View.GONE
+                }
             }
         }
 
         val deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
         deleteItemTouchHandler.attachToRecyclerView(binding?.rvList)
-        //testing
+
+        binding?.tvNoRecordsAvailable?.visibility = View.GONE
+        binding?.rvList?.visibility = View.VISIBLE
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions

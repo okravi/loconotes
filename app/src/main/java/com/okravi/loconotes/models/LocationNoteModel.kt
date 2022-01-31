@@ -6,7 +6,7 @@ import java.io.Serializable
 data class LocationNoteModel (
     var keyID: String = "",
     var googlePlaceID: String = "",
-    var placeName: String = "",
+    var placeName: String = "EMPTY",
     var placeLatitude: String = "",
     var placeLongitude: String = "",
     var placeLikelyHood: Double = 0.0,

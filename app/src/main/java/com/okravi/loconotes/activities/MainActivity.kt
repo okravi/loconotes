@@ -337,7 +337,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                 }
                                         if (photoMetadata != null) {
                                     listOfNearbyPlaces.add(nearbyLocation)
-                                            Log.d("debug", "Saving a place to a list")
+                                            Log.d("debug", "Saving a place to a list, places already: ${listOfNearbyPlaces.size}")
                                 }
                             }
                         }
@@ -361,12 +361,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
-                Log.d("debug", "clicked on add note" )
                 //making sure we don't display nearby items twice
                 listOfNearbyPlaces.clear()
 
+                //adding empty place
+                val emptyPlace = LocationNoteModel()
+                listOfNearbyPlaces.add(emptyPlace)
+
+                listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
+                listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
+                listOfNearbyPlaces[0].googlePlaceID = "none"
+
                 if(isLocationEnabled()) {
-                    Log.d("debug", "location is enabled, proceeding" )
+
                     getListOfLocationsForCurrentPosition()
 
                 }else{
@@ -411,8 +418,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             marker?.snippet = listOfSavedNotes[i].textNote
 
         }
-
-
     }
 
     private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
@@ -467,7 +472,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     //Making sure the location gets displayed on the map if user gives back the location permissions
-    //TODO: check if this is actually working
     override fun onStart() {
         super.onStart()
 
@@ -520,12 +524,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun getNotesListFromLocalDB(){
 
         val dbHandler = DatabaseHandler(this)
-        val notesListTester : ArrayList<dbNoteModel> = dbHandler.getNotesList()
-        Log.d("RCVD database:", notesListTester.size.toString())
-        // = dbHandler.getNotesList()
+        listOfSavedNotes = dbHandler.getNotesList()
 
-        if(notesListTester.size > 0){
-            listOfSavedNotes = notesListTester
+        if(listOfSavedNotes.size > 0){
             setupNotesListRecyclerView(listOfSavedNotes)
         }else {
             return
@@ -537,7 +538,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         var NOTE_DATA = "note_data"
         var NOTE_EDIT_ACTIVITY_REQUEST_CODE = 1
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

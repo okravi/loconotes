@@ -39,11 +39,10 @@
 
             <ImageView
                 android:id="@+id/place_photo"
-                android:background="@drawable/outlined_flat_background"
-                android:src="@drawable/ic_baseline_settings_24"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                />
+                android:background="@drawable/outlined_flat_background"
+                android:src="@drawable/ic_baseline_image_24" />
         </androidx.cardview.widget.CardView>
 
 
@@ -121,7 +120,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:text="Place Name"
                 android:textColor="#0e3746"
                 android:textSize="16sp"
 
@@ -142,7 +140,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:gravity="center"
-                    android:text="latitude"
                     android:textColor="#0e3746"
                     android:textSize="16sp" />
 
@@ -153,7 +150,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:gravity="center"
-                    android:text="longitude"
                     android:textColor="#0e3746"
                     android:textSize="16sp" />
 

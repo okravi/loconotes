@@ -42,6 +42,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var placeData: LocationNoteModel
     private lateinit var bmp: Bitmap
     private var creatingNewNote: Boolean = false
+    private var customNote: Boolean = false
     private lateinit var noteFromDB : ArrayList<dbNoteModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,9 +65,17 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etPlaceName?.setText(placeData.placeName)
             binding?.etLatitude?.setText(placeData.placeLatitude)
             binding?.etLongitude?.setText(placeData.placeLongitude)
-            val byteArray = placeData.photoByteArray
-            bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
-            binding?.placePhoto?.setImageBitmap(bmp)
+            //if the note is custom, showing a placeholder
+            if (placeData.photoByteArray!!.isNotEmpty()){
+
+                val byteArray = placeData.photoByteArray
+                bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+                binding?.placePhoto?.setImageBitmap(bmp)
+            }else{
+                customNote = true
+                //TODO: show placeholder image
+            }
+
         }
         //getting note data based on the swiped recyclerview position
         if(intent.hasExtra(MainActivity.NOTE_DATA)) {
@@ -113,7 +122,9 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
                 }
                 else {
-                    if(savedImagePath == null){
+                    //saving default image if there's one
+                    if((savedImagePath == null) && (!customNote)){
+
                         //saving Places image if user did not choose an alternative
                         savedImagePath = saveImageToInternalStorage(bmp)
                     }

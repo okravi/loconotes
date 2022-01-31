@@ -73,7 +73,6 @@ open class NotesAdapter(
         var tvNoteTitle = binding.tvNoteTitle
         var tvTextNote = binding.tvTextNote
         var ivNoteImage = binding.ivItemNote
-
     }
 }
 

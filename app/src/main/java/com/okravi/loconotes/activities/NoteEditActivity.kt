@@ -42,7 +42,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var placeData: LocationNoteModel
     private lateinit var bmp: Bitmap
     private var creatingNewNote: Boolean = false
-    private lateinit var notesListTester : ArrayList<dbNoteModel>
+    private lateinit var noteFromDB : ArrayList<dbNoteModel>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,14 +76,17 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
             //Reading note from DB based on keyID
             val dbHandler = DatabaseHandler(this)
-            notesListTester = dbHandler.getNote(noteData.keyID.toInt())
+            noteFromDB = dbHandler.getNote(noteData.keyID.toInt())
 
             //Displaying Note
-            binding?.etPlaceName?.setText(notesListTester[0].placeName)
-            binding?.etLatitude?.setText(notesListTester[0].placeLatitude)
-            binding?.etLongitude?.setText(notesListTester[0].placeLongitude)
-            binding?.etNote?.setText(notesListTester[0].textNote)
-            binding?.placePhoto?.setImageURI(notesListTester[0].photo.toUri())
+            binding?.etPlaceName?.setText(noteFromDB[0].placeName)
+            binding?.etLatitude?.setText(noteFromDB[0].placeLatitude)
+            binding?.etLongitude?.setText(noteFromDB[0].placeLongitude)
+            binding?.etNote?.setText(noteFromDB[0].textNote)
+            binding?.placePhoto?.setImageURI(noteFromDB[0].photo.toUri())
+
+            //image URI from DB
+            savedImagePath = noteFromDB[0].photo.toUri()
         }
     }
 
@@ -99,6 +102,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 takePhoto()
             }
             binding?.btnSaveNote?.id ->
+
             {
                 //if some fields are not filled show toast
                 if ((binding?.etPlaceName?.text.isNullOrEmpty() ||
@@ -115,8 +119,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     //saving note to the db
                     val dbNoteModel = dbNoteModel(
-                        (if(creatingNewNote) 0 else {notesListTester[0].keyID}) as String,
-                        placeData.googlePlaceID,
+                        (if(creatingNewNote) 0 else {noteFromDB[0].keyID}) as String,
+                        (if(creatingNewNote) placeData.googlePlaceID else {noteFromDB[0].googlePlaceID}),
                         binding?.etPlaceName?.text.toString(),
                         binding?.etLatitude?.text.toString(),
                         binding?.etLongitude?.text.toString(),
@@ -124,25 +128,27 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                         binding?.etNote?.text.toString(),
                         savedImagePath.toString(),
                     )
+
                     val dbHandler = DatabaseHandler(this)
 
-                    //TODO: updating functionality not checked yet!
                     if (creatingNewNote){
 
                         val addNote = dbHandler.addNote(dbNoteModel)
-                        Log.d("debug", "just saved to the db, save result is $addNote")
+
                         if(addNote > 0){
                             setResult(Activity.RESULT_OK)
                             finish()
                         }
-                    }else{
-                        setResult(Activity.RESULT_CANCELED)
+                    }
+                    if (!creatingNewNote){
+
                         val updateNote = dbHandler.updateNote(dbNoteModel)
 
                         if(updateNote > 0){
                             setResult(Activity.RESULT_OK)
                             finish()
                         }
+
                     }
                 }
             }
@@ -153,7 +159,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK){
             when (requestCode) {
-                //displaying locally stored image choen by user
+                //displaying locally stored image chosen by user
                 GALLERY -> {
                     if(data != null){
                         val contentURI = data.data

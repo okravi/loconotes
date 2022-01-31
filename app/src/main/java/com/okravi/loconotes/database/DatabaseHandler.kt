@@ -11,14 +11,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import com.okravi.loconotes.models.dbNoteModel
 
-
 open class DatabaseHandler(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         private const val DATABASE_VERSION = 1
         private const val DATABASE_NAME = "LocationNotesDatabase"
         private const val TABLE_NOTES = "NotesTable"
-
         private const val KEY_ID = "_id"
         private const val KEY_PLACE_NAME = "place_name"
         private const val KEY_PLACE_PHOTO = "place_photo"
@@ -67,6 +65,7 @@ open class DatabaseHandler(context: Context) :
     }
 
     fun updateNote(note: dbNoteModel): Int {
+
         val db = this.writableDatabase
         val contentValues = ContentValues()
         //contentValues.put(KEY_ID, note.keyID)
@@ -106,14 +105,11 @@ open class DatabaseHandler(context: Context) :
         val selectQuery = "SELECT * FROM $TABLE_NOTES WHERE $KEY_ID = $keyID"
         val db = this.readableDatabase
 
-        var databaseReadCycles = 1
-
         try{
             val cursor  : Cursor = db.rawQuery(selectQuery, null)
 
-
             if(cursor.moveToFirst()) do {
-                Log.d("database read cycle:", databaseReadCycles.toString())
+
                 val note = dbNoteModel(
                     cursor.getString(cursor.getColumnIndex(KEY_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
@@ -125,10 +121,6 @@ open class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                 )
                 notesList.add(note)
-                Log.d("reading database item:", note.placeName)
-                Log.d("itms in nlist database:", notesList.size.toString())
-
-                databaseReadCycles += 1
 
             }while (cursor.moveToNext())
             cursor.close()
@@ -138,13 +130,8 @@ open class DatabaseHandler(context: Context) :
             Log.d("excp database:", "caught exception")
             return ArrayList()
         }
-
-        Log.d("database items read:", {notesList.size.toString()}.toString())
-        Log.d("FINAL database:", notesList.size.toString())
-
         db.close()
         return notesList
-
     }
 
 
@@ -156,14 +143,11 @@ open class DatabaseHandler(context: Context) :
         val selectQuery = "SELECT * FROM $TABLE_NOTES"
         val db = this.readableDatabase
 
-        var databaseReadCycles = 1
-
         try{
             val cursor  : Cursor = db.rawQuery(selectQuery, null)
 
-
             if(cursor.moveToFirst()) do {
-                Log.d("database read cycle:", databaseReadCycles.toString())
+
                 val note = dbNoteModel(
                     cursor.getString(cursor.getColumnIndex(KEY_ID)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_ID)),
@@ -175,10 +159,6 @@ open class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                 )
                 notesList.add(note)
-                Log.d("reading database item:", note.placeName)
-                Log.d("itms in nlist database:", notesList.size.toString())
-
-                databaseReadCycles += 1
 
             }while (cursor.moveToNext())
             cursor.close()
@@ -189,12 +169,8 @@ open class DatabaseHandler(context: Context) :
             return ArrayList()
         }
 
-        Log.d("database items read:", {notesList.size.toString()}.toString())
-        Log.d("FINAL database:", notesList.size.toString())
-
         db.close()
         return notesList
-
     }
 
 }

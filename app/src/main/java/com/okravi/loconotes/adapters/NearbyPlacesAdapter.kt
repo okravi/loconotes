@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.okravi.loconotes.R
 import com.okravi.loconotes.databinding.ItemNearbyPlaceBinding
 import com.okravi.loconotes.models.LocationNoteModel
 
@@ -30,6 +31,12 @@ class NearbyPlacesAdapter(
 
         if (holder is MyViewHolder) {
             holder.tvNearbyPlaceName.text = model.placeName
+
+            //displaying an image placeholder for the first place rv
+            if (position == 0){
+                holder.ivNearbyPlacePhoto.setImageResource(
+                    R.drawable.ic_custom_rv_note_image_placeholder)
+            }
 
             if(model.photo != null){
                 holder.ivNearbyPlacePhoto.setImageBitmap(model.photo)

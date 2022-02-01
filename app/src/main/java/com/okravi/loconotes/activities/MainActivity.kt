@@ -285,7 +285,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-
+                    Log.d("debug", "getListOfLocationsForCurrentPosition/taskIsSuccessful" )
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
@@ -343,6 +343,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         }
                     }
                 } else {
+                    Log.d("debug", "Place not found")
                     val exception = task.exception
                     if (exception is ApiException) {
                         val statusCode = exception.statusCode
@@ -350,6 +351,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                             "Place not found: " +
                                     exception.message + ", " +
                                     "statusCode: " + statusCode)
+
                     }
                 }
             }

@@ -23,6 +23,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.okravi.loconotes.R
 import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityNoteEditBinding
 import com.okravi.loconotes.models.LocationNoteModel
@@ -65,15 +66,12 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etPlaceName?.setText(placeData.placeName)
             binding?.etLatitude?.setText(placeData.placeLatitude)
             binding?.etLongitude?.setText(placeData.placeLongitude)
-            //if the note is custom, showing a placeholder
+            //if the note is not custom, showing the saved image
             if (placeData.photoByteArray!!.isNotEmpty()){
 
                 val byteArray = placeData.photoByteArray
                 bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
                 binding?.placePhoto?.setImageBitmap(bmp)
-            }else{
-                customNote = true
-                //TODO: show placeholder image
             }
 
         }
@@ -92,8 +90,17 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etLatitude?.setText(noteFromDB[0].placeLatitude)
             binding?.etLongitude?.setText(noteFromDB[0].placeLongitude)
             binding?.etNote?.setText(noteFromDB[0].textNote)
-            binding?.placePhoto?.setImageURI(noteFromDB[0].photo.toUri())
 
+            val noteUri = noteFromDB[0].photo.toUri()
+
+            //if there's a valid URI, show saved photo
+            if (noteFromDB[0].photo.length > 5 ){
+                binding?.placePhoto?.setImageURI(noteUri)
+            //else show a placeholder
+            }else{
+                binding?.placePhoto?.setImageResource(
+                        R.drawable.ic_custom_rv_note_image_placeholder)
+            }
             //image URI from DB
             savedImagePath = noteFromDB[0].photo.toUri()
         }
@@ -130,7 +137,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     //saving note to the db
                     val dbNoteModel = dbNoteModel(
-                        (if(creatingNewNote) "0" else {noteFromDB[0].keyID}) as String,
+                        (if(creatingNewNote) "0" else {noteFromDB[0].keyID}),
                         (if(creatingNewNote) placeData.googlePlaceID else noteFromDB[0].googlePlaceID),
                         binding?.etPlaceName?.text.toString(),
                         binding?.etLatitude?.text.toString(),

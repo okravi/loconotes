@@ -28,7 +28,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -68,10 +70,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 30
     private var nearbyPlacesInRecyclerView: Boolean = false
+    //array of markers to manipulate
+    private val markers = ArrayList<Marker?>(5)
+    //number of highlighted Maker in markers array
+    private var highlightedMarker: Int = -1
     //creating empty list of places
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
     //creating empty list of notes to load to from the db
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,10 +91,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, getString(R.string.google_maps_key), Locale.US)
         }
-
-        val mapFragment =
-            supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
-        mapFragment!!.getMapAsync(this)
 
         binding?.btnAddNote?.setOnClickListener(this)
         binding?.btnListNotes?.setOnClickListener(this)
@@ -103,8 +106,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.translationX = 250F
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
-        //displaying saved notes
-        //getNotesListFromLocalDB()
     }
 
 
@@ -186,10 +187,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             // Sets the desired interval for
             // active location updates.
             interval = 60000
-
             // Sets the fastest rate for active location updates.
             fastestInterval = 2000
-
             // Sets the maximum time when batched location
             // updates are delivered.
             maxWaitTime = 500
@@ -229,15 +228,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d("markers", "were in onMapReady")
         if (locationPermissionsOK) {
-            Log.d("markers", "were in onMapReady by the location perms are OK")
-            Log.d("debug", "locationPermissions:$locationPermissionsOK")
             mMap = googleMap
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
-            //TODO: only show markers here, don't read the whole DB
+            //reading the db and setting up the notes rv
             getNotesListFromLocalDB()
-
 
             mMap.setOnMarkerClickListener { marker ->
                 if (marker.isInfoWindowShown) {
@@ -252,18 +248,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 true
             }
         }else{
+            //TODO: check if the if/else may be safely removed
             Log.d("markers", "were in onMapReady by the location perms are off")
         }
     }
 
     override fun onResume() {
-        //TODO check if this is really needed (when user gives the permission)
+
         super.onResume()
-        val mapFragment =
-            supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
-        mapFragment!!.getMapAsync(this)
-        Log.d("debug", "resuming")
-        //getNotesListFromLocalDB()
+
+        if (locationPermissionsOK) {
+            val mapFragment =
+                supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
+            mapFragment!!.getMapAsync(this)
+        }
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -379,20 +377,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     getListOfLocationsForCurrentPosition()
 
                 }else{
-                    Toast.makeText(this, "Please grant the location permission!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
                 }
             }
 
             binding?.btnListNotes?.id -> {
                 Toast.makeText(this, "list button", Toast.LENGTH_SHORT).show()
 
-                if (listOfSavedNotes.size > 0){
-                    setupNotesListRecyclerView(listOfSavedNotes)
-                }else{
-                    Toast.makeText(this, "No notes saved!", Toast.LENGTH_SHORT).show()
-                    //TODO fix the this logic, it's for testing only
-                    getNotesListFromLocalDB()
-                }
+                getNotesListFromLocalDB()
+
             }
 
             binding?.btnSettings?.id -> {
@@ -401,24 +394,46 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
+    private fun highlightClickedNoteMarkerOnMap(position: Int) {
+
+        //making sure there's no more than 1 highlighted marker
+        if (highlightedMarker != -1){
+            markers[highlightedMarker]?.setIcon(
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        }
+        markers[position]?.showInfoWindow()
+        markers[position]?.setIcon(
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        //saving highlighted marker position for future use
+        highlightedMarker = position
+    }
+
     private fun displaySavedNotesMarkersOnMap() {
 
         //displaying locations of saved notes on a map
-        Log.d("markers frm database", listOfSavedNotes.size.toString())
 
-        for (i in 0 until listOfSavedNotes.size) {
-            Log.d("setting up marker #", i.toString())
-            val markerPosition = LatLng(listOfSavedNotes[i].placeLatitude.toDouble(),
-                listOfSavedNotes[i].placeLongitude.toDouble())
-            Log.d("marker pos", "$markerPosition")
-            val marker = mMap.addMarker(
-                MarkerOptions()
-                    .position(markerPosition)
-                    .title(listOfSavedNotes[i].placeName)
-            )
-            marker?.tag = listOfSavedNotes[i].googlePlaceID
-            marker?.snippet = listOfSavedNotes[i].textNote
+        //deleting all already shown markers
+        mMap.clear()
+        markers.clear()
 
+        if (listOfSavedNotes.size >0){
+
+            for (i in 0 until listOfSavedNotes.size) {
+                Log.d("setting up marker #", i.toString())
+                val markerPosition = LatLng(listOfSavedNotes[i].placeLatitude.toDouble(),
+                    listOfSavedNotes[i].placeLongitude.toDouble())
+
+                val newMarker = mMap.addMarker(
+                    MarkerOptions()
+                        .position(markerPosition)
+                        .title(listOfSavedNotes[i].placeName)
+                )
+
+                markers.add(newMarker)
+
+                markers[i]?.tag = listOfSavedNotes[i].googlePlaceID
+                markers[i]?.snippet = listOfSavedNotes[i].textNote
+            }
         }
     }
 
@@ -434,11 +449,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-                Toast.makeText(this@MainActivity, "clicked on a NOTE ${notesList[position].keyID}", Toast.LENGTH_SHORT).show()
-
+                //changing color of clicked marker
+                highlightClickedNoteMarkerOnMap(position)
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
+
         displaySavedNotesMarkersOnMap()
 
         val editSwipeHandler = object: SwipeToEditCallback(this){
@@ -455,9 +471,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val adapter = binding?.rvList?.adapter as NotesAdapter
+
+                //removing marker of the deleted note
+                markers[viewHolder.adapterPosition]?.remove()
+                markers.removeAt(viewHolder.adapterPosition)
+                //removing rv
                 adapter.removeAt(viewHolder.adapterPosition)
 
-                Log.d("debug", "items in view ${adapter.itemCount}")
                 //showing "No records available" if the last note is deleted
                 if (adapter.itemCount < 1 ){
                     binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
@@ -476,13 +496,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Making sure the location gets displayed on the map if user gives back the location permissions
     override fun onStart() {
         super.onStart()
-
+        /*
         if(locationPermissionsOK){
             getFusedUserLocation()
             val mapFragment =
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
             mapFragment!!.getMapAsync(this)
         }
+         */
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
@@ -526,9 +547,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun getNotesListFromLocalDB(){
 
         val dbHandler = DatabaseHandler(this)
+        listOfSavedNotes.clear()
+
         listOfSavedNotes = dbHandler.getNotesList()
 
         if(listOfSavedNotes.size > 0){
+
             setupNotesListRecyclerView(listOfSavedNotes)
         }else {
             return

@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.setOnClickListener(this)
         binding?.btnSettings?.setOnClickListener(this)
 
+
         //animating the buttons
         binding?.btnSettings?.translationX = 250F
         binding?.btnSettings?.
@@ -223,6 +224,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
 
+
+
     //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
@@ -235,6 +238,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             //reading the db and setting up the notes rv
             getNotesListFromLocalDB()
 
+            //if clicked on My Location button, setup markers once again and center on user's loc
+            mMap.setOnMyLocationButtonClickListener() {
+                highlightedMarker = -1
+                displaySavedNotesMarkersOnMap()
+                true
+            }
+            //when clicked on a marker show details
+            //TODO: highlight related note rv and change marker color here
             mMap.setOnMarkerClickListener { marker ->
                 if (marker.isInfoWindowShown) {
                     marker.hideInfoWindow()

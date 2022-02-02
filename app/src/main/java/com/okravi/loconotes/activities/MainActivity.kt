@@ -213,8 +213,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             //Zooming in on user's location
             //animating camera only if the user did not change zoom level
             val zoom: Float = mMap.cameraPosition.zoom
-            //not zooming in if user zoomed in/out manually
-            if ((zoom == 18f) || initialCameraZoomIn){
+            //not zooming in if user zoomed in/out manually or clicked on a marker
+            if (((zoom == 18f) || initialCameraZoomIn) && (highlightedMarker == -1)){
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
                 mMap.animateCamera(newLatLngZoom)
                 initialCameraZoomIn = false
@@ -406,6 +406,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         //saving highlighted marker position for future use
         highlightedMarker = position
+
+        //zooming in on a highlighted marker
+        val highlightedMarkerPosition = markers[position]!!.position
+        val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition, 18f)
+        mMap.animateCamera(newLatLngZoom)
+
     }
 
     private fun displaySavedNotesMarkersOnMap() {

@@ -11,6 +11,9 @@ import com.okravi.loconotes.activities.NoteEditActivity
 import com.okravi.loconotes.databinding.ItemNoteBinding
 import com.okravi.loconotes.models.dbNoteModel
 import android.content.Context
+import android.graphics.Color
+import androidx.core.content.ContextCompat
+import com.okravi.loconotes.R
 import com.okravi.loconotes.activities.MainActivity
 import com.okravi.loconotes.database.DatabaseHandler
 
@@ -36,6 +39,15 @@ open class NotesAdapter(
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote
             holder.ivNoteImage.setImageURI(model.photo.toUri())
+
+            //changing background color of selected/deselected rv
+            if (items[position].isSelected){
+
+                holder.cvItemNote.background.setTint(Color.LTGRAY)
+
+            }else{
+                holder.cvItemNote.background.setTint(Color.WHITE)
+            }
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
@@ -73,6 +85,7 @@ open class NotesAdapter(
 
     interface OnClickListener{
         fun onClick(position: Int, model: dbNoteModel)
+
     }
     //describe item view and metadata about its place within the RecyclerView
     private class MyViewHolder(binding: ItemNoteBinding):
@@ -81,6 +94,7 @@ open class NotesAdapter(
         var tvNoteTitle = binding.tvNoteTitle
         var tvTextNote = binding.tvTextNote
         var ivNoteImage = binding.ivItemNote
+        var cvItemNote = binding.cvItemNote
     }
 }
 

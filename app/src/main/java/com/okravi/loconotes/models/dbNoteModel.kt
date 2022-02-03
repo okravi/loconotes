@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import java.io.Serializable
 
-data class dbNoteModel (
+data class dbNoteModel(
     var keyID: String = "",
     var googlePlaceID: String = "",
     var placeName: String = "",
@@ -13,5 +13,6 @@ data class dbNoteModel (
     var dateNoteLastModified: String = "",
     var textNote: String = "",
     var photo: String = "",
+    var isSelected: Boolean = false,
 
     ): Serializable

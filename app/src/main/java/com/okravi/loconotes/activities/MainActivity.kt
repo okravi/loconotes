@@ -75,6 +75,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //number of highlighted Maker in markers array
     private var highlightedMarker: Int = -1
     //creating empty list of places
+    private var selectedNotesRV : Int = -1
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
     //creating empty list of notes to load to from the db
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
@@ -273,6 +274,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
             mapFragment!!.getMapAsync(this)
         }
+        //to let the same item be selected again when user gets back to the MainActivity
+        selectedNotesRV = -1
     }
 
     //Getting a list of locations closest to the user's current location. Checking permissions
@@ -422,16 +425,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val highlightedMarkerPosition = markers[position]!!.position
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition, 18f)
         mMap.animateCamera(newLatLngZoom)
-
     }
 
     private fun displaySavedNotesMarkersOnMap() {
 
         //displaying locations of saved notes on a map
-
         //deleting all already shown markers
         mMap.clear()
         markers.clear()
+
+        //resetting highlighted marker id
+        highlightedMarker = -1
 
         if (listOfSavedNotes.size >0){
 
@@ -447,7 +451,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 )
 
                 markers.add(newMarker)
-
                 markers[i]?.tag = listOfSavedNotes[i].googlePlaceID
                 markers[i]?.snippet = listOfSavedNotes[i].textNote
             }
@@ -467,8 +470,22 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
                 //changing color of clicked marker
-                highlightClickedNoteMarkerOnMap(position)
+
+                //TODO: solve the bug with 1 item not sel/desel
+                    highlightClickedNoteMarkerOnMap(position)
+                    //changing color of the note rv user clicked on
+                    notesList[position].isSelected = true
+                    notesAdapter.notifyItemChanged(position)
+
+
+                //deselecting previously selected note rv
+                if (selectedNotesRV != -1){
+                    notesList[selectedNotesRV].isSelected = false
+                    notesAdapter.notifyItemChanged(selectedNotesRV)
+                }
+                selectedNotesRV = position
             }
+
         })
         binding?.rvList?.scheduleLayoutAnimation()
 
@@ -493,13 +510,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 markers[viewHolder.adapterPosition]?.remove()
                 markers.removeAt(viewHolder.adapterPosition)
                 //removing rv
-                adapter.removeAt(viewHolder.adapterPosition)
+                val adapterPosition = viewHolder.adapterPosition
+                adapter.removeAt(adapterPosition)
+                adapter.notifyItemRemoved(adapterPosition)
 
-                //showing "No records available" if the last note is deleted
+                //in case previously selected RV was deleted
+                if (selectedNotesRV == adapterPosition){
+                    selectedNotesRV = -1
+                }
+                //in case previously highlighted marker was deleted
+                if (highlightedMarker == adapterPosition){
+                    highlightedMarker = -1
+                }
+
                 if (adapter.itemCount < 1 ){
                     binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
                     binding?.rvList?.visibility = View.GONE
                 }
+
+                displaySavedNotesMarkersOnMap()
             }
         }
 

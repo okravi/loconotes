@@ -130,6 +130,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 }
                 else {
                     //saving default image if there's one
+                        //TODO: crashing with no photo
                     if((savedImagePath == null) && (!customNote)){
 
                         //saving Places image if user did not choose an alternative

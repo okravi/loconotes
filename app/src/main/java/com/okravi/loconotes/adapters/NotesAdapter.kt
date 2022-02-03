@@ -42,9 +42,7 @@ open class NotesAdapter(
 
             //changing background color of selected/deselected rv
             if (items[position].isSelected){
-
                 holder.cvItemNote.background.setTint(Color.LTGRAY)
-
             }else{
                 holder.cvItemNote.background.setTint(Color.WHITE)
             }

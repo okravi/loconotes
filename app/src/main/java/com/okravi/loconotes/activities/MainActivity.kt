@@ -97,7 +97,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.setOnClickListener(this)
         binding?.btnSettings?.setOnClickListener(this)
 
-
         //animating the buttons
         binding?.btnSettings?.translationX = 250F
         binding?.btnSettings?.
@@ -223,9 +222,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         }
     }
-
-
-
 
     //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
@@ -408,6 +404,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
+    //return highlighted marker back to original state
+    private fun setSelectedMarkerBackToDefault(position: Int){
+        if (highlightedMarker != -1){
+            markers[highlightedMarker]?.setIcon(
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            markers[position]?.hideInfoWindow()
+        }
+        highlightedMarker = -1
+    }
+
     private fun highlightClickedNoteMarkerOnMap(position: Int) {
 
         //making sure there's no more than 1 highlighted marker
@@ -469,23 +475,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-                //changing color of clicked marker
 
-                //TODO: solve the bug with 1 item not sel/desel
+                //highlighting clicked on and relevant marker
+                if (!notesList[position].isSelected){
+
                     highlightClickedNoteMarkerOnMap(position)
-                    //changing color of the note rv user clicked on
                     notesList[position].isSelected = true
                     notesAdapter.notifyItemChanged(position)
 
+                }else{
+                    setSelectedMarkerBackToDefault(position)
+                    notesList[position].isSelected = false
+                    notesAdapter.notifyItemChanged(position)
+                }
 
                 //deselecting previously selected note rv
-                if (selectedNotesRV != -1){
+                if ((selectedNotesRV != -1) && (selectedNotesRV != position)){
                     notesList[selectedNotesRV].isSelected = false
                     notesAdapter.notifyItemChanged(selectedNotesRV)
                 }
                 selectedNotesRV = position
             }
-
         })
         binding?.rvList?.scheduleLayoutAnimation()
 

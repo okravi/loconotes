@@ -2,6 +2,7 @@ package com.okravi.loconotes.models
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.google.android.gms.maps.model.Marker
 import java.io.Serializable
 
 data class dbNoteModel(
@@ -14,6 +15,7 @@ data class dbNoteModel(
     var textNote: String = "",
     var photo: String = "",
     var isSelected: Boolean = false,
-    var proximity: Float = -1.0F
+    var proximity: Float = -1.0F,
+    var marker: Marker? = null
 
     ): Serializable

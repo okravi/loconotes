@@ -257,13 +257,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 marker.showInfoWindow()
 
+
                 //testing
+                //keyz
                 for (item in markers.indices){
 
                     if (markers[item]?.id == marker.id){
                         highlightClickedNoteMarkerOnMap(item)
                     }
                 }
+/*
+                for (i in listOfSavedNotes.indices){
+                    if (listOfSavedNotes[i]?.marker?.id == marker.id){
+                        highlightClickedNoteMarkerOnMap(i)
+                    }
+                }
+
+ */
 
                 true
             }
@@ -423,7 +433,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         if (highlightedMarker != -1){
             markers[highlightedMarker]?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+
+//            listOfSavedNotes[highlightedMarker].marker?.setIcon(
+//                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+
             markers[position]?.hideInfoWindow()
+//            listOfSavedNotes[position].marker?.hideInfoWindow()
+
         }
         highlightedMarker = -1
     }
@@ -434,15 +450,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         if (highlightedMarker != -1){
             markers[highlightedMarker]?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+
+//            listOfSavedNotes[position].marker?.setIcon(
+//                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         }
         markers[position]?.showInfoWindow()
+//        listOfSavedNotes[position].marker?.showInfoWindow()
         markers[position]?.setIcon(
             BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+//        listOfSavedNotes[position].marker?.setIcon(
+//            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         //saving highlighted marker position for future use
         highlightedMarker = position
 
         //zooming in on a highlighted marker
         val highlightedMarkerPosition = markers[position]!!.position
+
+//        val highlightedMarkerPosition = listOfSavedNotes[position].marker?.position
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition, 18f)
         mMap.animateCamera(newLatLngZoom)
 
@@ -454,6 +478,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         //deleting all already shown markers
         mMap.clear()
         markers.clear()
+//
+//        for (note in listOfSavedNotes){
+//            note.marker = null
+//        }
+
 
         //resetting highlighted marker id
         highlightedMarker = -1
@@ -461,7 +490,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         if (listOfSavedNotes.size >0){
 
             for (i in 0 until listOfSavedNotes.size) {
-                Log.d("setting up marker #", i.toString())
+
                 val markerPosition = LatLng(listOfSavedNotes[i].placeLatitude.toDouble(),
                     listOfSavedNotes[i].placeLongitude.toDouble())
 
@@ -470,10 +499,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         .position(markerPosition)
                         .title(listOfSavedNotes[i].placeName)
                 )
+/*                //saving marker
+                listOfSavedNotes[i].marker = newMarker
+                listOfSavedNotes[i].marker?.tag = listOfSavedNotes[i].googlePlaceID
+                listOfSavedNotes[i].marker?.snippet = listOfSavedNotes[i].textNote
+                //to be deleted after moving markers to listOfSavedNotes
 
+ */
                 markers.add(newMarker)
                 markers[i]?.tag = listOfSavedNotes[i].googlePlaceID
                 markers[i]?.snippet = listOfSavedNotes[i].textNote
+                //
             }
         }
     }
@@ -535,6 +571,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 markers[viewHolder.adapterPosition]?.remove()
                 markers.removeAt(viewHolder.adapterPosition)
                 //removing rv
+
+ //               listOfSavedNotes[viewHolder.adapterPosition].marker?.remove()
+
                 val adapterPosition = viewHolder.adapterPosition
                 adapter.removeAt(adapterPosition)
 
@@ -639,7 +678,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 Log.d("debug", "Place ${note.placeName} distance to currentLoc is ${note.proximity}")
             }
             setupNotesListRecyclerView(listOfSavedNotes)
-            //displaySavedNotesMarkersOnMap()
+
         }else{
             return
         }

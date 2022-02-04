@@ -52,12 +52,15 @@ import com.okravi.loconotes.models.dbNoteModel
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
+import java.lang.Math.sqrt
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.sqrt
 
 private var binding : ActivityMainBinding? = null
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
+    private lateinit var notesAdapter : NotesAdapter
     //GoogleMaps class for map manipulation
     private lateinit var mMap: GoogleMap
     // FusedLocationProviderClient - Main class for receiving location updates.
@@ -204,6 +207,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //LocationCallback - Called when FusedLocationProviderClient has a new Location
     private val mLocationCallBack = object : LocationCallback(){
         var initialCameraZoomIn: Boolean = true
+        var initialLocationResult = true
 
         override fun onLocationResult(locationResult: LocationResult){
 
@@ -211,6 +215,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val mLatitude = currentLocation!!.latitude
             val mLongitude = currentLocation!!.longitude
             val position = LatLng(mLatitude, mLongitude)
+
+            if (initialLocationResult){
+                calculateNoteProximityToCurrentLocation()
+                initialLocationResult = false
+            }
             //Zooming in on user's location
             //animating camera only if the user did not change zoom level
             val zoom: Float = mMap.cameraPosition.zoom
@@ -226,7 +235,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.d("markers", "were in onMapReady")
+
         if (locationPermissionsOK) {
             mMap = googleMap
             mMap.isMyLocationEnabled = true
@@ -234,6 +243,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             mMap.uiSettings.isZoomControlsEnabled = false
             //reading the db and setting up the notes rv
             getNotesListFromLocalDB()
+            calculateNoteProximityToCurrentLocation()
 
             //if clicked on My Location button, setup markers once again and center on user's loc
             mMap.setOnMyLocationButtonClickListener() {
@@ -241,23 +251,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 displaySavedNotesMarkersOnMap()
                 true
             }
-            //when clicked on a marker show details
-            //TODO: highlight related note rv and change marker color here
+
+            //when clicked on a marker show details and change marker's color
             mMap.setOnMarkerClickListener { marker ->
-                if (marker.isInfoWindowShown) {
-                    marker.hideInfoWindow()
-                    Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
-                        .show()
-                }else{
-                    marker.showInfoWindow()
-                    Toast.makeText(this, "clicked on a marker ${marker.tag}", Toast.LENGTH_SHORT)
-                        .show()
+
+                marker.showInfoWindow()
+
+                //testing
+                for (item in markers.indices){
+
+                    if (markers[item]?.id == marker.id){
+                        highlightClickedNoteMarkerOnMap(item)
+                    }
                 }
+
                 true
             }
+
         }else{
-            //TODO: check if the if/else may be safely removed
-            Log.d("markers", "were in onMapReady by the location perms are off")
+            checkLocationPermissionsWithDexter()
         }
     }
 
@@ -269,6 +281,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val mapFragment =
                 supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
             mapFragment!!.getMapAsync(this)
+
         }
         //to let the same item be selected again when user gets back to the MainActivity
         selectedNotesRV = -1
@@ -395,6 +408,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 Toast.makeText(this, "list button", Toast.LENGTH_SHORT).show()
 
                 getNotesListFromLocalDB()
+                calculateNoteProximityToCurrentLocation()
 
             }
 
@@ -431,6 +445,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val highlightedMarkerPosition = markers[position]!!.position
         val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition, 18f)
         mMap.animateCamera(newLatLngZoom)
+
     }
 
     private fun displaySavedNotesMarkersOnMap() {
@@ -466,7 +481,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
 
         binding?.rvList?.layoutManager = LinearLayoutManager(this@MainActivity)
-        val notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
+        notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = notesAdapter
 
@@ -522,7 +537,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 //removing rv
                 val adapterPosition = viewHolder.adapterPosition
                 adapter.removeAt(adapterPosition)
-                adapter.notifyItemRemoved(adapterPosition)
 
                 //in case previously selected RV was deleted
                 if (selectedNotesRV == adapterPosition){
@@ -604,13 +618,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         val dbHandler = DatabaseHandler(this)
         listOfSavedNotes.clear()
-
         listOfSavedNotes = dbHandler.getNotesList()
+    }
 
-        if(listOfSavedNotes.size > 0){
+    private fun calculateNoteProximityToCurrentLocation(){
 
+        if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
+
+            val mLatitude = currentLocation!!.latitude.toLong()
+            val mLongitude = currentLocation!!.longitude.toLong()
+
+            for (note in listOfSavedNotes){
+                val noteLatitude = note.placeLatitude.toFloat()
+                val noteLongitude = note.placeLongitude.toFloat()
+                val a = (mLatitude.minus(noteLatitude)).times(mLatitude.minus(noteLatitude))
+                val b = (mLongitude.minus(noteLongitude)).times(mLongitude.minus(noteLongitude))
+                val distance = sqrt(a.plus(b))
+
+                note.proximity = distance
+                Log.d("debug", "Place ${note.placeName} distance to currentLoc is ${note.proximity}")
+            }
             setupNotesListRecyclerView(listOfSavedNotes)
-        }else {
+            //displaySavedNotesMarkersOnMap()
+        }else{
             return
         }
     }

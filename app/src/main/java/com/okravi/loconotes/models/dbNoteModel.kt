@@ -14,5 +14,6 @@ data class dbNoteModel(
     var textNote: String = "",
     var photo: String = "",
     var isSelected: Boolean = false,
+    var proximity: Float = -1.0F
 
     ): Serializable

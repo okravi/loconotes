@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
     //creating empty list of notes to load to from the db
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
-
+    val sortNotesByParameter: String = "proximity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val mLongitude = currentLocation!!.longitude
             val position = LatLng(mLatitude, mLongitude)
 
-            if (initialLocationResult){
+            if ((initialLocationResult) && (sortNotesByParameter == "proximity")){
                 calculateNoteProximityToCurrentLocation()
                 initialLocationResult = false
             }
@@ -243,7 +243,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             mMap.uiSettings.isZoomControlsEnabled = false
             //reading the db and setting up the notes rv
             getNotesListFromLocalDB()
-            calculateNoteProximityToCurrentLocation()
+
 
             //if clicked on My Location button, setup markers once again and center on user's loc
             mMap.setOnMyLocationButtonClickListener() {
@@ -258,7 +258,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 marker.showInfoWindow()
                 //looking up marker in listOfSavedNotes and highlighting it
                 for (i in listOfSavedNotes.indices){
-                    if (listOfSavedNotes[i]?.marker?.id == marker.id){
+                    if (listOfSavedNotes[i].marker?.id == marker.id){
                         highlightClickedNoteMarkerOnMap(i)
                     }
                 }
@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //in the onClick function
     @SuppressLint("MissingPermission")
     private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
-        Log.d("debug", "getListOfLocationsForCurrentPosition/start" )
+
         var placesWithPhotosCounter = 0
         var bitmapsSavedCounter = 0
         var cycleCounter = 0
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d("debug", "getListOfLocationsForCurrentPosition/taskIsSuccessful" )
+
                     val response = task.result
                     for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
@@ -326,7 +326,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                     .photoMetadatas?.first()
                                 if (photoMetadata != null){
                                     placesWithPhotosCounter += 1
-                                    Log.d("debug", "we have a photo")
                                     val photoRequest = FetchPhotoRequest
                                         .builder(photoMetadata)
                                         .setMaxWidth(500)
@@ -338,7 +337,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                             val bitmap = fetchPhotoResponse.bitmap
                                             nearbyLocation.photo = bitmap
                                             bitmapsSavedCounter += 1
-                                            //TODO: this is a temporary solution to photos loading late
+
                                             if (bitmapsSavedCounter == placesWithPhotosCounter){
                                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
@@ -355,7 +354,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                 }
                                         if (photoMetadata != null) {
                                     listOfNearbyPlaces.add(nearbyLocation)
-                                            Log.d("debug", "Saving a place to a list, places already: ${listOfNearbyPlaces.size}")
                                 }
                             }
                         }
@@ -401,11 +399,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
 
             binding?.btnListNotes?.id -> {
-                Toast.makeText(this, "list button", Toast.LENGTH_SHORT).show()
 
                 getNotesListFromLocalDB()
-                calculateNoteProximityToCurrentLocation()
-
             }
 
             binding?.btnSettings?.id -> {
@@ -621,6 +616,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val dbHandler = DatabaseHandler(this)
         listOfSavedNotes.clear()
         listOfSavedNotes = dbHandler.getNotesList()
+
+        if(listOfSavedNotes.size > 0){
+            sortNotes()
+        }
     }
 
     private fun calculateNoteProximityToCurrentLocation(){
@@ -640,10 +639,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 note.proximity = distance
                 Log.d("debug", "Place ${note.placeName} distance to currentLoc is ${note.proximity}")
             }
+
+            listOfSavedNotes.sortWith(compareBy { it.proximity })
+
             setupNotesListRecyclerView(listOfSavedNotes)
 
         }else{
             return
+        }
+    }
+
+
+    private fun sortNotes(){
+
+        when (sortNotesByParameter) {
+            "proximity" -> {
+                calculateNoteProximityToCurrentLocation()
+            }
+
+            "alphabet" -> {
+                //TODO: implement alternative sorting here
+            }
         }
     }
 

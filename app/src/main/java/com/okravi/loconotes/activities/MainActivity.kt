@@ -256,25 +256,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             mMap.setOnMarkerClickListener { marker ->
 
                 marker.showInfoWindow()
-
-
-                //testing
-                //keyz
-                for (item in markers.indices){
-
-                    if (markers[item]?.id == marker.id){
-                        highlightClickedNoteMarkerOnMap(item)
-                    }
-                }
-/*
+                //looking up marker in listOfSavedNotes and highlighting it
                 for (i in listOfSavedNotes.indices){
                     if (listOfSavedNotes[i]?.marker?.id == marker.id){
                         highlightClickedNoteMarkerOnMap(i)
                     }
                 }
-
- */
-
                 true
             }
 
@@ -382,7 +369,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                             "Place not found: " +
                                     exception.message + ", " +
                                     "statusCode: " + statusCode)
-
                     }
                 }
             }
@@ -431,14 +417,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //return highlighted marker back to original state
     private fun setSelectedMarkerBackToDefault(position: Int){
         if (highlightedMarker != -1){
-            markers[highlightedMarker]?.setIcon(
+
+            listOfSavedNotes[highlightedMarker].marker?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
 
-//            listOfSavedNotes[highlightedMarker].marker?.setIcon(
-//                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-
-            markers[position]?.hideInfoWindow()
-//            listOfSavedNotes[position].marker?.hideInfoWindow()
+            listOfSavedNotes[position].marker?.hideInfoWindow()
 
         }
         highlightedMarker = -1
@@ -448,28 +431,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         //making sure there's no more than 1 highlighted marker
         if (highlightedMarker != -1){
-            markers[highlightedMarker]?.setIcon(
+            listOfSavedNotes[highlightedMarker].marker?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-
-//            listOfSavedNotes[position].marker?.setIcon(
-//                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         }
-        markers[position]?.showInfoWindow()
-//        listOfSavedNotes[position].marker?.showInfoWindow()
-        markers[position]?.setIcon(
+        //highlighting marker
+        listOfSavedNotes[position].marker?.showInfoWindow()
+        listOfSavedNotes[position].marker?.setIcon(
             BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-//        listOfSavedNotes[position].marker?.setIcon(
-//            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         //saving highlighted marker position for future use
         highlightedMarker = position
 
         //zooming in on a highlighted marker
-        val highlightedMarkerPosition = markers[position]!!.position
-
-//        val highlightedMarkerPosition = listOfSavedNotes[position].marker?.position
-        val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition, 18f)
+        val highlightedMarkerPosition = listOfSavedNotes[position].marker?.position
+        val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(highlightedMarkerPosition!!, 18f)
         mMap.animateCamera(newLatLngZoom)
-
     }
 
     private fun displaySavedNotesMarkersOnMap() {
@@ -477,12 +452,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         //displaying locations of saved notes on a map
         //deleting all already shown markers
         mMap.clear()
-        markers.clear()
-//
-//        for (note in listOfSavedNotes){
-//            note.marker = null
-//        }
 
+        for (note in listOfSavedNotes){
+            note.marker = null
+        }
 
         //resetting highlighted marker id
         highlightedMarker = -1
@@ -499,17 +472,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         .position(markerPosition)
                         .title(listOfSavedNotes[i].placeName)
                 )
-/*                //saving marker
+                //saving marker
                 listOfSavedNotes[i].marker = newMarker
                 listOfSavedNotes[i].marker?.tag = listOfSavedNotes[i].googlePlaceID
                 listOfSavedNotes[i].marker?.snippet = listOfSavedNotes[i].textNote
-                //to be deleted after moving markers to listOfSavedNotes
-
- */
-                markers.add(newMarker)
-                markers[i]?.tag = listOfSavedNotes[i].googlePlaceID
-                markers[i]?.snippet = listOfSavedNotes[i].textNote
-                //
             }
         }
     }
@@ -568,12 +534,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val adapter = binding?.rvList?.adapter as NotesAdapter
 
                 //removing marker of the deleted note
-                markers[viewHolder.adapterPosition]?.remove()
-                markers.removeAt(viewHolder.adapterPosition)
+                listOfSavedNotes[viewHolder.adapterPosition].marker?.remove()
+
                 //removing rv
-
- //               listOfSavedNotes[viewHolder.adapterPosition].marker?.remove()
-
                 val adapterPosition = viewHolder.adapterPosition
                 adapter.removeAt(adapterPosition)
 

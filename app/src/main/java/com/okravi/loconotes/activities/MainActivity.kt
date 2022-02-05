@@ -586,7 +586,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         nearbyPlacesAdapter.setOnClickListener(object : NearbyPlacesAdapter.OnClickListener{
             override fun onClick(position: Int, model: LocationNoteModel) {
-                Toast.makeText(this@MainActivity, "clicked on a place", Toast.LENGTH_SHORT).show()
 
                 val newNote = LocationNoteModel()
 
@@ -626,18 +625,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
 
-            val mLatitude = currentLocation!!.latitude.toLong()
-            val mLongitude = currentLocation!!.longitude.toLong()
-
+            val mLatitude = currentLocation!!.latitude.toFloat()
+            val mLongitude = currentLocation!!.longitude.toFloat()
             for (note in listOfSavedNotes){
+
                 val noteLatitude = note.placeLatitude.toFloat()
                 val noteLongitude = note.placeLongitude.toFloat()
+
                 val a = (mLatitude.minus(noteLatitude)).times(mLatitude.minus(noteLatitude))
                 val b = (mLongitude.minus(noteLongitude)).times(mLongitude.minus(noteLongitude))
                 val distance = sqrt(a.plus(b))
 
                 note.proximity = distance
-                Log.d("debug", "Place ${note.placeName} distance to currentLoc is ${note.proximity}")
             }
 
             listOfSavedNotes.sortWith(compareBy { it.proximity })

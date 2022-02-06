@@ -404,7 +404,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
 
             binding?.btnSettings?.id -> {
-                Toast.makeText(this, "Settings button clicked", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                startActivity(intent)
             }
         }
     }

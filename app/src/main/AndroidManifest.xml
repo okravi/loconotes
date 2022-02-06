@@ -20,6 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Loconotes">
         <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.NoteEditActivity"
             android:exported="false" />
         <!--

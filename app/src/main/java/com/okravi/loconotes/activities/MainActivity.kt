@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
@@ -52,12 +53,12 @@ import com.okravi.loconotes.models.dbNoteModel
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
-import java.lang.Math.sqrt
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
 private var binding : ActivityMainBinding? = null
+private const val sharedPrefFile = "loconotesSettings"
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListener {
     private lateinit var notesAdapter : NotesAdapter
@@ -653,15 +654,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     private fun sortNotes(){
 
-        when (sortNotesByParameter) {
+        //when (sortNotesByParameter) {
+        when (readSetting("sortOrder")) {
+            "default" -> {
+                calculateNoteProximityToCurrentLocation()
+            }
             "proximity" -> {
                 calculateNoteProximityToCurrentLocation()
             }
-
-            "alphabet" -> {
+            "placeName" -> {
+                //TODO: implement alternative sorting here
+            }
+            "dateModified" -> {
                 //TODO: implement alternative sorting here
             }
         }
+    }
+
+    private fun readSetting(setting: String): String? {
+        val sharedPreferences: SharedPreferences =
+            this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
+        Log.d("debug", "$setting is ${sharedPreferences.getString(setting, "default")}")
+        Log.d("debug", "updateNoteListMethod is ${sharedPreferences.getString("updateNoteListMethod", "default")}")
+        val test = sharedPreferences.contains(setting)
+        Log.d("debug", "$setting is saved and being read: $test")
+        return sharedPreferences.getString(setting, "default")
+
     }
 
     companion object {

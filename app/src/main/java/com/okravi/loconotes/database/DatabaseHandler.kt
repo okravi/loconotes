@@ -116,7 +116,7 @@ open class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_NAME)),
                     cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)),
                     cursor.getString(cursor.getColumnIndex(KEY_LONGITUDE)),
-                    cursor.getString(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
+                    cursor.getLong(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
                     cursor.getString(cursor.getColumnIndex(KEY_NOTE)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                 )
@@ -154,7 +154,7 @@ open class DatabaseHandler(context: Context) :
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_NAME)),
                     cursor.getString(cursor.getColumnIndex(KEY_LATITUDE)),
                     cursor.getString(cursor.getColumnIndex(KEY_LONGITUDE)),
-                    cursor.getString(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
+                    cursor.getLong(cursor.getColumnIndex(KEY_DATE_MODIFIED)),
                     cursor.getString(cursor.getColumnIndex(KEY_NOTE)),
                     cursor.getString(cursor.getColumnIndex(KEY_PLACE_PHOTO)),
                 )

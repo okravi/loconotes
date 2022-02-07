@@ -11,7 +11,7 @@ data class dbNoteModel(
     var placeName: String = "",
     var placeLatitude: String = "",
     var placeLongitude: String = "",
-    var dateNoteLastModified: String = "",
+    var dateNoteLastModified: Long = 0,
     var textNote: String = "",
     var photo: String = "",
     var isSelected: Boolean = false,

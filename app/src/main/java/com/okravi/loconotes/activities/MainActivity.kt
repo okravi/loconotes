@@ -651,10 +651,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
-
+    //sorting notes based on saved settings
     private fun sortNotes(){
-
-        //when (sortNotesByParameter) {
         when (readSetting("sortOrder")) {
             "default" -> {
                 calculateNoteProximityToCurrentLocation()
@@ -663,10 +661,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 calculateNoteProximityToCurrentLocation()
             }
             "placeName" -> {
-                //TODO: implement alternative sorting here
+                listOfSavedNotes.sortWith(
+                    compareBy { it.placeName })
+                setupNotesListRecyclerView(listOfSavedNotes)
             }
             "dateModified" -> {
-                //TODO: implement alternative sorting here
+                listOfSavedNotes.sortWith(
+                    compareBy<dbNoteModel> { it.dateNoteLastModified }.reversed())
+
+                setupNotesListRecyclerView(listOfSavedNotes)
             }
         }
     }
@@ -674,12 +677,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun readSetting(setting: String): String? {
         val sharedPreferences: SharedPreferences =
             this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
-        Log.d("debug", "$setting is ${sharedPreferences.getString(setting, "default")}")
-        Log.d("debug", "updateNoteListMethod is ${sharedPreferences.getString("updateNoteListMethod", "default")}")
-        val test = sharedPreferences.contains(setting)
-        Log.d("debug", "$setting is saved and being read: $test")
-        return sharedPreferences.getString(setting, "default")
 
+        return sharedPreferences.getString(setting, "default")
     }
 
     companion object {

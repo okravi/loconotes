@@ -138,14 +138,14 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     }
                     //saving note to the db
                     val dbNoteModel = dbNoteModel(
-                        (if(creatingNewNote) "0" else {noteFromDB[0].keyID}),
-                        (if(creatingNewNote) placeData.googlePlaceID else noteFromDB[0].googlePlaceID),
-                        binding?.etPlaceName?.text.toString(),
-                        binding?.etLatitude?.text.toString(),
-                        binding?.etLongitude?.text.toString(),
-                        Calendar.getInstance().time.toString(),
-                        binding?.etNote?.text.toString(),
-                        savedImagePath.toString(),
+                            (if(creatingNewNote) "0" else {noteFromDB[0].keyID}),
+                    (if(creatingNewNote) placeData.googlePlaceID else noteFromDB[0].googlePlaceID),
+                    binding?.etPlaceName?.text.toString(),
+                    binding?.etLatitude?.text.toString(),
+                    binding?.etLongitude?.text.toString(),
+                    Calendar.getInstance().timeInMillis,
+                    binding?.etNote?.text.toString(),
+                    savedImagePath.toString(),
                     )
 
                     val dbHandler = DatabaseHandler(this)

@@ -74,8 +74,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private var currentLocation: Location? = null
     private val maxNumberOfNearbyPlacesToShowUser = 30
     private var nearbyPlacesInRecyclerView: Boolean = false
-    //array of markers to manipulate
-    private val markers = ArrayList<Marker?>(5)
     //number of highlighted Maker in markers array
     private var highlightedMarker: Int = -1
     //creating empty list of places
@@ -83,13 +81,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     var listOfNearbyPlaces = ArrayList<LocationNoteModel>(5)
     //creating empty list of notes to load to from the db
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
-    val sortNotesByParameter: String = "proximity"
 
     private var updatePlacesListMethod: String? = "default"
     private var updateNoteListMethod: String? = "default"
     private lateinit var lastPositionListUpdatedAt : LatLng
     private var lastTimeListAutoUpdatedBasedOnUserLocation: Long = 0
     private val distanceUserHasToMoveForTheListToAutoUpdate = 0.0014854462
+
+    private var notesListInView = false
+    private var placesListInView = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -223,17 +223,30 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val mLongitude = currentLocation!!.longitude
             val position = LatLng(mLatitude, mLongitude)
 
-            if ((initialLocationResult) && (sortNotesByParameter == "proximity")){
+            if ((initialLocationResult) &&
+                (updateNoteListMethod == "proximity") || (updateNoteListMethod == "default")){
                 lastPositionListUpdatedAt = position
                 calculateNoteProximityToCurrentLocation()
                 initialLocationResult = false
             }
             //updating notes list if enough time has passed and user moved far enough
-            //TODO: add condition to check whether there notes in view
-            if ((sortNotesByParameter == "proximity") && isItTimeToAutoUpdateList()){
+            if ((updateNoteListMethod == "proximity") &&
+                isItTimeToAutoUpdateList() &&
+                    notesListInView){
                 lastPositionListUpdatedAt = position
                 calculateNoteProximityToCurrentLocation()
             }
+
+            //updating places list if enough time has passed and user moved far enough
+            if ((updatePlacesListMethod == "proximity") &&
+                isItTimeToAutoUpdateList() &&
+                placesListInView){
+
+                lastPositionListUpdatedAt = position
+                kickOffPlaceListSetupProcess()
+            }
+
+
 
             //Zooming in on user's location
             //animating camera only if the user did not change zoom level
@@ -290,7 +303,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         super.onResume()
         //reading settings to see if lists should be auto updated when user moves
         updatePlacesListMethod = readSetting("updatePlacesListMethod")
-        updatePlacesListMethod = readSetting("updatePlacesListMethod")
+        updateNoteListMethod = readSetting("updateNoteListMethod")
 
         if (locationPermissionsOK) {
             val mapFragment =
@@ -357,6 +370,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                             bitmapsSavedCounter += 1
 
                                             if (bitmapsSavedCounter == placesWithPhotosCounter){
+
                                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
 
@@ -396,24 +410,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onClick(v: View?) {
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
-                //making sure we don't display nearby items twice
-                listOfNearbyPlaces.clear()
 
-                //adding empty place
-                val emptyPlace = LocationNoteModel()
-                listOfNearbyPlaces.add(emptyPlace)
+                kickOffPlaceListSetupProcess()
 
-                listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
-                listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
-                listOfNearbyPlaces[0].googlePlaceID = "none"
-
-                if(isLocationEnabled()) {
-
-                    getListOfLocationsForCurrentPosition()
-
-                }else{
-                    Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
-                }
             }
 
             binding?.btnListNotes?.id -> {
@@ -426,6 +425,27 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val intent = Intent(this@MainActivity, SettingsActivity::class.java)
                 startActivity(intent)
             }
+        }
+    }
+
+    private fun kickOffPlaceListSetupProcess(){
+        //making sure we don't display nearby items twice
+        listOfNearbyPlaces.clear()
+
+        //adding empty place
+        val emptyPlace = LocationNoteModel()
+        listOfNearbyPlaces.add(emptyPlace)
+
+        listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
+        listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
+        listOfNearbyPlaces[0].googlePlaceID = "none"
+
+        if(isLocationEnabled()) {
+
+            getListOfLocationsForCurrentPosition()
+
+        }else{
+            Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -499,6 +519,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.rvList?.layoutManager = LinearLayoutManager(this@MainActivity)
         notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
+
+        notesListInView = true
+        placesListInView = false
+
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = notesAdapter
 
@@ -597,6 +621,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
+
+        notesListInView = false
+        placesListInView = true
 
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter
@@ -705,6 +732,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 Calendar.getInstance().timeInMillis
         //if enough time passed since last update
         if (timePassedSinceLastAutoUpdate > 10000){
+
+            lastTimeListAutoUpdatedBasedOnUserLocation = Calendar.getInstance().timeInMillis
 
             val cLatitude = currentLocation!!.latitude
             val cLongitude = currentLocation!!.longitude

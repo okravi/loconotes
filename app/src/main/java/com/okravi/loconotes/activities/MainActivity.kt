@@ -89,21 +89,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private lateinit var lastPositionListUpdatedAt : LatLng
     private var lastTimeListAutoUpdatedBasedOnUserLocation: Long = 0
     private val distanceUserHasToMoveForTheListToAutoUpdate = 0.0014854462
-    //should be set up to 6000
-    private val minimumListUpdateDelay = 1500
+    //minimum time to pass to refresh list with autoupdate turned on
+    private val minimumListUpdateDelay = 6000
 
-    private var notesListInView = false
+    private var notesListInView = true
     private var placesListInView = false
-//testing
+
     var initialCameraZoomIn: Boolean = true
     var initialLocationResult = true
-//testing
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-
-
 
         checkLocationPermissionsWithDexter()
 
@@ -239,7 +237,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 (sortOrder == "proximity") &&
                 notesListInView){
                 lastPositionListUpdatedAt = position
-                calculateNoteProximityToCurrentLocation()
+                //calculateNoteProximityToCurrentLocation()
+                //testing
+                Log.d("debug", "we'll be getting notes from DB now")
+                getNotesListFromLocalDB()
+                //testing
                 initialLocationResult = false
             }
             //updating notes list if enough time has passed and user moved far enough
@@ -285,8 +287,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
             //reading the db and setting up the notes rv
-            Log.d("debug", "we'll be getting notes from DB now")
-            getNotesListFromLocalDB()
+
+            // moving this to onLocationResult
+
+            if(sortOrder != "proximity"){
+                Log.d("debug", "we'll be getting notes from DB now")
+                getNotesListFromLocalDB()
+            }
 
 
             //if clicked on My Location button, setup markers once again and center on user's loc
@@ -691,7 +698,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun calculateNoteProximityToCurrentLocation(){
         //TODO: FIX, current loc is not available yet when this executes
         Log.d("debug", "we're in calculateNoteProximityToCurrentLocation()")
-        Log.d("debug", "Gor this many notes:${listOfSavedNotes.size}, Current loc is:$currentLocation")
+        Log.d("debug", "Got this many notes:${listOfSavedNotes.size}, Current loc is:$currentLocation")
         if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
             Log.d("debug", "we're in calculateNoteProximityToCurrentLocation() CYCLE")
             val mLatitude = currentLocation!!.latitude.toFloat()

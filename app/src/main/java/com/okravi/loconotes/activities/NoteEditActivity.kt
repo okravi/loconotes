@@ -106,6 +106,13 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        binding?.etLatitude?.isEnabled = false
+        binding?.etLongitude?.isEnabled = false
+    }
+
     override fun onClick(v: View?) {
         when (v!!.id){
             binding?.btnLoadPicture?.id ->

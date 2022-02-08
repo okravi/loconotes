@@ -85,6 +85,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     var listOfSavedNotes = ArrayList<dbNoteModel>(5)
     val sortNotesByParameter: String = "proximity"
 
+    private var updatePlacesListMethod: String? = "default"
+    private var updateNoteListMethod: String? = "default"
+    private lateinit var lastPositionListUpdatedAt : LatLng
+    private var lastTimeListAutoUpdatedBasedOnUserLocation: Long = 0
+    private val distanceUserHasToMoveForTheListToAutoUpdate = 0.0014854462
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -218,9 +224,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             val position = LatLng(mLatitude, mLongitude)
 
             if ((initialLocationResult) && (sortNotesByParameter == "proximity")){
+                lastPositionListUpdatedAt = position
                 calculateNoteProximityToCurrentLocation()
                 initialLocationResult = false
             }
+            //updating notes list if enough time has passed and user moved far enough
+            //TODO: add condition to check whether there notes in view
+            if ((sortNotesByParameter == "proximity") && isItTimeToAutoUpdateList()){
+                lastPositionListUpdatedAt = position
+                calculateNoteProximityToCurrentLocation()
+            }
+
             //Zooming in on user's location
             //animating camera only if the user did not change zoom level
             val zoom: Float = mMap.cameraPosition.zoom
@@ -274,6 +288,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onResume() {
 
         super.onResume()
+        //reading settings to see if lists should be auto updated when user moves
+        updatePlacesListMethod = readSetting("updatePlacesListMethod")
+        updatePlacesListMethod = readSetting("updatePlacesListMethod")
 
         if (locationPermissionsOK) {
             val mapFragment =
@@ -639,6 +656,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val b = (mLongitude.minus(noteLongitude)).times(mLongitude.minus(noteLongitude))
                 val distance = sqrt(a.plus(b))
 
+                Log.d("debug", "Distance from ${note.placeName} to current location is $distance")
+
                 note.proximity = distance
             }
 
@@ -679,6 +698,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             this.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 
         return sharedPreferences.getString(setting, "default")
+    }
+
+    private fun isItTimeToAutoUpdateList(): Boolean{
+        val timePassedSinceLastAutoUpdate = lastTimeListAutoUpdatedBasedOnUserLocation -
+                Calendar.getInstance().timeInMillis
+        //if enough time passed since last update
+        if (timePassedSinceLastAutoUpdate > 10000){
+
+            val cLatitude = currentLocation!!.latitude
+            val cLongitude = currentLocation!!.longitude
+            val lLatitude = lastPositionListUpdatedAt.latitude
+            val lLongitude = lastPositionListUpdatedAt.longitude
+
+            val a = (cLatitude.minus(lLatitude)).times(cLatitude.minus(lLatitude))
+            val b = (cLongitude.minus(cLongitude)).times(cLongitude.minus(lLongitude))
+            val distanceUserMovedSinceLastListUpdate = sqrt(a.plus(b))
+            //is user moved far enough
+            if (distanceUserMovedSinceLastListUpdate > distanceUserHasToMoveForTheListToAutoUpdate) {
+                return true
+            }
+        }
+
+        return false
     }
 
     companion object {

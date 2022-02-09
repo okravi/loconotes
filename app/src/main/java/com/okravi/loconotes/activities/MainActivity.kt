@@ -2,6 +2,7 @@ package com.okravi.loconotes.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -267,6 +268,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val newLatLngZoom = CameraUpdateFactory.newLatLngZoom(position, 18f)
                 mMap.animateCamera(newLatLngZoom)
                 initialCameraZoomIn = false
+            }
+        }
+    }
+
+    //TODO: switch to registerForActivityResult
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+
+                getNotesListFromLocalDB()
+            } else {
+                Log.e("Activity", "Cancelled or Back Pressed")
             }
         }
     }

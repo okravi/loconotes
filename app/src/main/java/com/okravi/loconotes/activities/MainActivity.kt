@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,6 +52,9 @@ import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
@@ -347,19 +351,19 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //Getting a list of locations closest to the user's current location. Permissions already checked.
     @SuppressLint("MissingPermission")
-    private fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel>{
+    private suspend fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel> = withContext(Dispatchers.IO){
 
-        var placesWithPhotosCounter = 0
-        var bitmapsSavedCounter = 0
-        var cycleCounter = 0
-        //Client that exposes the Places API methods
-        val placesClient = Places.createClient(this)
-        // Use fields to define the data types to return.
-        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG,
-            Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
-        // Use the builder to create a FindCurrentPlaceRequest.
-        val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
-        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+            var placesWithPhotosCounter = 0
+            var bitmapsSavedCounter = 0
+            var cycleCounter = 0
+            //Client that exposes the Places API methods
+            val placesClient = Places.createClient(this@MainActivity)
+            // Use fields to define the data types to return.
+            val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG,
+                Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
+            // Use the builder to create a FindCurrentPlaceRequest.
+            val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
+            // Call findCurrentPlace and handle the response (first check that the user has granted permission).
             val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
             placeResponse.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -413,7 +417,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                             }
                                         }
                                 }
-                                        if (photoMetadata != null) {
+                                if (photoMetadata != null) {
                                     listOfNearbyPlaces.add(nearbyLocation)
                                 }
                             }
@@ -432,9 +436,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
             }
 
-        binding?.tvNoRecordsAvailable?.visibility = View.GONE
-        return listOfNearbyPlaces
+            binding?.tvNoRecordsAvailable?.visibility = View.GONE
+            return@withContext listOfNearbyPlaces
+
     }
+
 
     override fun onClick(v: View?) {
         when (v!!.id) {
@@ -470,8 +476,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         listOfNearbyPlaces[0].googlePlaceID = "none"
 
         if(isLocationEnabled()) {
-
-            getListOfLocationsForCurrentPosition()
+            //testing
+            lifecycleScope.launch {
+                getListOfLocationsForCurrentPosition()
+            }
 
         }else{
             Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()

@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private var updatePlacesListMethod: String? = "default"
     private var updateNoteListMethod: String? = "default"
     private var sortOrder: String? = "default"
+    private var placesPreloaded = false
 
     private lateinit var lastPositionListUpdatedAt : LatLng
     private var lastTimeListAutoUpdatedBasedOnUserLocation: Long = 0
@@ -130,6 +131,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
     }
+
 
 
     //Checking if location service is enabled on the device
@@ -246,7 +248,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             if ((sortOrder == "proximity") &&
                 (!initialLocationResult) &&
                 (updateNoteListMethod == "automatic") &&
-                    notesListInView){
+                notesListInView){
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
                     lastPositionListUpdatedAt = position
@@ -260,7 +262,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
                     lastPositionListUpdatedAt = position
-                    kickOffPlaceListSetupProcess()
+                    kickOffPlaceListSetupProcess("showPlaces")
                 }
             }
 
@@ -326,6 +328,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 true
             }
 
+            //testing preloading places
+            lifecycleScope.launch {
+                getListOfLocationsForCurrentPosition("preload")
+            }
+
         }else{
             checkLocationPermissionsWithDexter()
         }
@@ -351,94 +358,98 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //Getting a list of locations closest to the user's current location. Permissions already checked.
     @SuppressLint("MissingPermission")
-    private suspend fun getListOfLocationsForCurrentPosition(): List<LocationNoteModel> = withContext(Dispatchers.IO){
+    private suspend fun getListOfLocationsForCurrentPosition(parameter: String): List<LocationNoteModel> = withContext(Dispatchers.IO){
 
-            var placesWithPhotosCounter = 0
-            var bitmapsSavedCounter = 0
-            var cycleCounter = 0
-            //Client that exposes the Places API methods
-            val placesClient = Places.createClient(this@MainActivity)
-            // Use fields to define the data types to return.
-            val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG,
-                Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
-            // Use the builder to create a FindCurrentPlaceRequest.
-            val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
-            // Call findCurrentPlace and handle the response (first check that the user has granted permission).
-            val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
-            placeResponse.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
+        var placesWithPhotosCounter = 0
+        var bitmapsSavedCounter = 0
+        var cycleCounter = 0
+        //Client that exposes the Places API methods
+        val placesClient = Places.createClient(this@MainActivity)
+        // Use fields to define the data types to return.
+        val placeFields: List<Place.Field> = listOf(Place.Field.NAME, Place.Field.LAT_LNG,
+            Place.Field.ID, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS)
+        // Use the builder to create a FindCurrentPlaceRequest.
+        val requestNearbyPlaces: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
+        // Call findCurrentPlace and handle the response (first check that the user has granted permission).
+        val placeResponse = placesClient.findCurrentPlace(requestNearbyPlaces)
+        placeResponse.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
 
-                    val response = task.result
-                    for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
+                val response = task.result
+                for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
-                        //Going through $maxNumberOfNearbyPlacesToShowUser and saving if they have photos
-                        when {
-                            cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
+                    //Going through $maxNumberOfNearbyPlacesToShowUser and saving if they have photos
+                    when {
+                        cycleCounter<maxNumberOfNearbyPlacesToShowUser -> {
 
-                                val nearbyLocation = LocationNoteModel()
-                                nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
-                                nearbyLocation.placeName = placeLikelihood.place.name!!
-                                nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!
-                                    .latitude.toString()
-                                nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!
-                                    .longitude.toString()
-                                nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
+                            val nearbyLocation = LocationNoteModel()
+                            nearbyLocation.googlePlaceID = placeLikelihood.place.id!!.toString()
+                            nearbyLocation.placeName = placeLikelihood.place.name!!
+                            nearbyLocation.placeLatitude = placeLikelihood.place.latLng!!
+                                .latitude.toString()
+                            nearbyLocation.placeLongitude = placeLikelihood.place.latLng!!
+                                .longitude.toString()
+                            nearbyLocation.placeLikelyHood = placeLikelihood.likelihood
 
-                                cycleCounter += 1
+                            cycleCounter += 1
 
-                                val photoMetadata = placeLikelihood.place
-                                    .photoMetadatas?.first()
-                                if (photoMetadata != null){
-                                    placesWithPhotosCounter += 1
-                                    val photoRequest = FetchPhotoRequest
-                                        .builder(photoMetadata)
-                                        .setMaxWidth(500)
-                                        .setMaxHeight(500)
-                                        .build()
+                            val photoMetadata = placeLikelihood.place
+                                .photoMetadatas?.first()
+                            if (photoMetadata != null){
+                                placesWithPhotosCounter += 1
+                                val photoRequest = FetchPhotoRequest
+                                    .builder(photoMetadata)
+                                    .setMaxWidth(500)
+                                    .setMaxHeight(500)
+                                    .build()
 
-                                    placesClient.fetchPhoto(photoRequest)
-                                        .addOnSuccessListener { fetchPhotoResponse ->
-                                            val bitmap = fetchPhotoResponse.bitmap
-                                            nearbyLocation.photo = bitmap
-                                            bitmapsSavedCounter += 1
+                                placesClient.fetchPhoto(photoRequest)
+                                    .addOnSuccessListener { fetchPhotoResponse ->
+                                        val bitmap = fetchPhotoResponse.bitmap
+                                        nearbyLocation.photo = bitmap
+                                        bitmapsSavedCounter += 1
 
-                                            if (bitmapsSavedCounter == placesWithPhotosCounter){
-
+                                        if (bitmapsSavedCounter == placesWithPhotosCounter){
+                                            //testing
+                                            placesPreloaded = true
+                                            Log.d("debug", "placesPreloaded:$placesPreloaded")
+                                            if (parameter == "showPlaces"){
+                                                placesPreloaded = false
+                                                Log.d("debug", "seeing up Places RV")
                                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
-
-                                        }.addOnFailureListener { exception ->
-                                            if (exception is ApiException) {
-                                                val statusCode = exception.statusCode
-                                                Log.e(TAG,
-                                                    "Place not found: " +
-                                                            exception.message + ", " +
-                                                            "statusCode: " + statusCode)
-                                            }
                                         }
-                                }
-                                if (photoMetadata != null) {
-                                    listOfNearbyPlaces.add(nearbyLocation)
-                                }
+
+                                    }.addOnFailureListener { exception ->
+                                        if (exception is ApiException) {
+                                            val statusCode = exception.statusCode
+                                            Log.e(TAG,
+                                                "Place not found: " +
+                                                        exception.message + ", " +
+                                                        "statusCode: " + statusCode)
+                                        }
+                                    }
+                            }
+                            if (photoMetadata != null) {
+                                listOfNearbyPlaces.add(nearbyLocation)
                             }
                         }
                     }
-                } else {
-                    Log.d("debug", "Place not found")
-                    val exception = task.exception
-                    if (exception is ApiException) {
-                        val statusCode = exception.statusCode
-                        Log.e(TAG,
-                            "Place not found: " +
-                                    exception.message + ", " +
-                                    "statusCode: " + statusCode)
-                    }
+                }
+            } else {
+                Log.d("debug", "Place not found")
+                val exception = task.exception
+                if (exception is ApiException) {
+                    val statusCode = exception.statusCode
+                    Log.e(TAG,
+                        "Place not found: " +
+                                exception.message + ", " +
+                                "statusCode: " + statusCode)
                 }
             }
+        }
 
-            binding?.tvNoRecordsAvailable?.visibility = View.GONE
-            return@withContext listOfNearbyPlaces
-
+        return@withContext listOfNearbyPlaces
     }
 
 
@@ -446,13 +457,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         when (v!!.id) {
             binding?.btnAddNote?.id -> {
 
-                kickOffPlaceListSetupProcess()
+                kickOffPlaceListSetupProcess("showPlaces")
 
             }
 
             binding?.btnListNotes?.id -> {
 
                 getNotesListFromLocalDB()
+                kickOffPlaceListSetupProcess("preloadPlaces")
             }
 
             binding?.btnSettings?.id -> {
@@ -463,27 +475,60 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
-    private fun kickOffPlaceListSetupProcess(){
-        //making sure we don't display nearby items twice
-        listOfNearbyPlaces.clear()
+    private fun kickOffPlaceListSetupProcess(parameter: String){
 
-        //adding empty place
-        val emptyPlace = LocationNoteModel()
-        listOfNearbyPlaces.add(emptyPlace)
+        if ((!placesPreloaded) && (parameter == "preloadPlaces")){
+            //making sure we don't display nearby items twice
+            listOfNearbyPlaces.clear()
 
-        listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
-        listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
-        listOfNearbyPlaces[0].googlePlaceID = "none"
+            //adding empty place
+            val emptyPlace = LocationNoteModel()
+            listOfNearbyPlaces.add(emptyPlace)
 
-        if(isLocationEnabled()) {
-            //testing
-            lifecycleScope.launch {
-                getListOfLocationsForCurrentPosition()
+            listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
+            listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
+            listOfNearbyPlaces[0].googlePlaceID = "none"
+
+            if(isLocationEnabled()) {
+                //testing
+                binding?.tvNoRecordsAvailable?.visibility = View.GONE
+                lifecycleScope.launch {
+                    getListOfLocationsForCurrentPosition("preloadPlaces")
+                }
+
+            }else{
+                Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
             }
-
-        }else{
-            Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
         }
+
+        if((placesPreloaded) && (parameter == "showPlaces")){
+            placesPreloaded = false
+            setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
+        }
+
+        if((!placesPreloaded) && (parameter == "showPlaces")){
+
+            listOfNearbyPlaces.clear()
+
+            //adding empty place
+            val emptyPlace = LocationNoteModel()
+            listOfNearbyPlaces.add(emptyPlace)
+
+            listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
+            listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
+            listOfNearbyPlaces[0].googlePlaceID = "none"
+
+            if(isLocationEnabled()) {
+
+                lifecycleScope.launch {
+                    getListOfLocationsForCurrentPosition("showPlaces")
+                }
+            }
+        }
+    }
+
+    private fun preloadPlaces(){
+
     }
 
     //return highlighted marker back to original state
@@ -795,7 +840,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         }
 
-    return false
+        return false
     }
 
     companion object {

@@ -243,6 +243,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 lastPositionListUpdatedAt = position
                 getNotesListFromLocalDB()
                 initialLocationResult = false
+
+                kickOffPlaceListSetupProcess("preloadPlaces")
             }
             //updating notes list if enough time has passed and user moved far enough
             if ((sortOrder == "proximity") &&
@@ -259,6 +261,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             //updating places list if enough time has passed and user moved far enough
             if ((updatePlacesListMethod == "automatic") &&
                 placesListInView){
+
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
                     lastPositionListUpdatedAt = position
@@ -304,7 +307,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
             //reading the db and setting up the notes rv
             if(sortOrder != "proximity"){
-                Log.d("debug", "we'll be getting notes from DB now")
                 getNotesListFromLocalDB()
             }
 
@@ -327,11 +329,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
                 true
             }
-
+/*
             //testing preloading places
             lifecycleScope.launch {
-                getListOfLocationsForCurrentPosition("preload")
+                kickOffPlaceListSetupProcess("preloadPlaces")
             }
+
+ */
 
         }else{
             checkLocationPermissionsWithDexter()
@@ -375,6 +379,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         placeResponse.addOnCompleteListener { task ->
             if (task.isSuccessful) {
 
+                //making sure we don't display nearby items twice
+                listOfNearbyPlaces.clear()
+
+                //adding empty place
+                val emptyPlace = LocationNoteModel()
+                listOfNearbyPlaces.add(emptyPlace)
+
+                listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
+                listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
+                listOfNearbyPlaces[0].googlePlaceID = "none"
+
                 val response = task.result
                 for (placeLikelihood: PlaceLikelihood in response?.placeLikelihoods ?: emptyList()) {
 
@@ -412,10 +427,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                         if (bitmapsSavedCounter == placesWithPhotosCounter){
                                             //testing
                                             placesPreloaded = true
-                                            Log.d("debug", "placesPreloaded:$placesPreloaded")
+
                                             if (parameter == "showPlaces"){
                                                 placesPreloaded = false
-                                                Log.d("debug", "seeing up Places RV")
                                                 setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
                                             }
                                         }
@@ -458,7 +472,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             binding?.btnAddNote?.id -> {
 
                 kickOffPlaceListSetupProcess("showPlaces")
-
             }
 
             binding?.btnListNotes?.id -> {
@@ -478,16 +491,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private fun kickOffPlaceListSetupProcess(parameter: String){
 
         if ((!placesPreloaded) && (parameter == "preloadPlaces")){
-            //making sure we don't display nearby items twice
-            listOfNearbyPlaces.clear()
-
-            //adding empty place
-            val emptyPlace = LocationNoteModel()
-            listOfNearbyPlaces.add(emptyPlace)
-
-            listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
-            listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
-            listOfNearbyPlaces[0].googlePlaceID = "none"
 
             if(isLocationEnabled()) {
                 //testing
@@ -502,21 +505,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
 
         if((placesPreloaded) && (parameter == "showPlaces")){
-            placesPreloaded = false
+
             setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
         }
 
         if((!placesPreloaded) && (parameter == "showPlaces")){
-
-            listOfNearbyPlaces.clear()
-
-            //adding empty place
-            val emptyPlace = LocationNoteModel()
-            listOfNearbyPlaces.add(emptyPlace)
-
-            listOfNearbyPlaces[0].placeLatitude = currentLocation!!.latitude.toString()
-            listOfNearbyPlaces[0].placeLongitude = currentLocation!!.longitude.toString()
-            listOfNearbyPlaces[0].googlePlaceID = "none"
 
             if(isLocationEnabled()) {
 
@@ -746,17 +739,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         listOfSavedNotes = dbHandler.getNotesList()
 
         if(listOfSavedNotes.size > 0){
-            Log.d("debug", "got enough notes to sort")
+
             sortNotes()
         }
     }
 
     private fun calculateNoteProximityToCurrentLocation(){
         //TODO: FIX, current loc is not available yet when this executes
-        Log.d("debug", "we're in calculateNoteProximityToCurrentLocation()")
-        Log.d("debug", "Got this many notes:${listOfSavedNotes.size}, Current loc is:$currentLocation")
+
         if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
-            Log.d("debug", "we're in calculateNoteProximityToCurrentLocation() CYCLE")
+
             val mLatitude = currentLocation!!.latitude.toFloat()
             val mLongitude = currentLocation!!.longitude.toFloat()
             for (note in listOfSavedNotes){
@@ -767,8 +759,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val a = (mLatitude.minus(noteLatitude)).times(mLatitude.minus(noteLatitude))
                 val b = (mLongitude.minus(noteLongitude)).times(mLongitude.minus(noteLongitude))
                 val distance = sqrt(a.plus(b))
-
-                Log.d("debug", "Distance from ${note.placeName} to current location is $distance")
 
                 note.proximity = distance
             }
@@ -789,7 +779,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 calculateNoteProximityToCurrentLocation()
             }
             "proximity" -> {
-                Log.d("debug", "we'll be calculating proximity now")
+
                 calculateNoteProximityToCurrentLocation()
             }
             "placeName" -> {

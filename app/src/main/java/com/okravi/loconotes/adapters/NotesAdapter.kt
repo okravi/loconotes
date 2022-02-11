@@ -49,7 +49,7 @@ open class NotesAdapter(
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
-
+                    Log.d("debug", "holder.itemView.setOnClickListener{: clicked on $position")
                     onClickRecyclerListener!!.onClick(position, model)
                 }
             }
@@ -66,6 +66,8 @@ open class NotesAdapter(
         if(isDeleted > 0){
             items.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
+
+            Log.d("debug", "fun removeAt(adapterPosition: Int):removed at $adapterPosition")
         }
     }
 

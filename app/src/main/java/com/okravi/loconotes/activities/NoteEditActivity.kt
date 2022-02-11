@@ -108,7 +108,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-
+        //graying out coordinates fields
         binding?.etLatitude?.isEnabled = false
         binding?.etLongitude?.isEnabled = false
     }
@@ -134,8 +134,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                             binding?.etNote?.text.isNullOrEmpty())
                 ) {
                     Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
-                }
-                else {
+                } else {
                     //saving default image if there's one
                         //TODO: crashing with no photo
                     if((savedImagePath == null) && (!customNote)){
@@ -157,31 +156,54 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
                     val dbHandler = DatabaseHandler(this)
 
-                    if (creatingNewNote){
+                    when {
+                        creatingNewNote -> {
+                            Log.d("debug", "creatingNewNote")
+                            val addNote = dbHandler.addNote(dbNoteModel)
 
-                        val addNote = dbHandler.addNote(dbNoteModel)
-
-                        if(addNote > 0){
-                            setResult(Activity.RESULT_OK)
-                            finish()
-                        }
-                    }
-                    if (!creatingNewNote){
-
-                        val updateNote = dbHandler.updateNote(dbNoteModel)
-
-                        if(updateNote > 0){
-                            setResult(Activity.RESULT_OK)
-                            finish()
+                            if(addNote > 0){
+                                Log.d("debug", "addNote > 0")
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
                         }
 
+                        !creatingNewNote -> {
+                            Log.d("debug", "!creatingNewNote")
+                            val updateNote = dbHandler.updateNote(dbNoteModel)
+
+                            if(updateNote > 0){
+                                Log.d("debug", "updateNote > 0")
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                        }
+
+                    //}
+/*
+                    when {
+                        !creatingNewNote -> {
+                            Log.d("debug", "!creatingNewNote")
+                            val updateNote = dbHandler.updateNote(dbNoteModel)
+
+                            if(updateNote > 0){
+                                Log.d("debug", "updateNote > 0")
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            }
+                        }
+
+ */
                     }
+
+
                 }
             }
         }
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("debug", "onActivityResult in NoteEditActivity")
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK){
             when (requestCode) {

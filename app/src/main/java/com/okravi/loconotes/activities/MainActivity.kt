@@ -284,8 +284,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //TODO: switch to registerForActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        Log.d("debug", "onActivityResult")
         if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
+            Log.d("debug", "onActivityResult, resultCode: $requestCode")
             if (resultCode == Activity.RESULT_OK) {
 
                 getNotesListFromLocalDB()
@@ -358,6 +359,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
         //to let the same item be selected again when user gets back to the MainActivity
         selectedNotesRV = -1
+
+
     }
 
     //Getting a list of locations closest to the user's current location. Permissions already checked.
@@ -605,7 +608,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-
+                Log.d("string", "notesAdapter.setOnClickListener, clicked on $position")
                 //highlighting clicked on and relevant marker
                 if (!notesList[position].isSelected){
 
@@ -637,7 +640,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
             }
         }
-
+        //TODO check if this is necessary
         val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
 
@@ -651,6 +654,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 //removing rv
                 val adapterPosition = viewHolder.adapterPosition
+                Log.d("debug", "removing viewHolder.adapterPosition at $adapterPosition")
                 adapter.removeAt(adapterPosition)
 
                 //in case previously selected RV was deleted
@@ -667,7 +671,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     binding?.rvList?.visibility = View.GONE
                 }
 
-                displaySavedNotesMarkersOnMap()
+                //TODO:
+                //displaySavedNotesMarkersOnMap()
+                /*
+                getNotesListFromLocalDB()
+
+                 */
+                //listOfSavedNotes.removeAt(adapterPosition)
+                setupNotesListRecyclerView(listOfSavedNotes)
             }
         }
 
@@ -724,6 +735,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 val intent = Intent(this@MainActivity, NoteEditActivity::class.java)
                 intent.putExtra(PLACE_DATA, newNote)
+
                 startActivity(intent)
             }
         })

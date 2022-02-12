@@ -59,7 +59,7 @@ open class DatabaseHandler(context: Context) :
         contentValues.put(KEY_LONGITUDE, note.placeLongitude)
 
         val result = db.insert(TABLE_NOTES, null, contentValues)
-
+        Log.d("debug", "created note in Database handler, result is:$result")
         db.close()
         return result
     }
@@ -77,13 +77,14 @@ open class DatabaseHandler(context: Context) :
         contentValues.put(KEY_LATITUDE, note.placeLatitude)
         contentValues.put(KEY_LONGITUDE, note.placeLongitude)
 
-        val success = db.update(
+        val result = db.update(
             TABLE_NOTES,
             contentValues,
             KEY_ID + "=" + note.keyID, null)
 
         db.close()
-        return success
+        Log.d("debug", "updated note in Database handler, result is:$result")
+        return result
     }
 
     fun deleteNote(note: dbNoteModel): Int {

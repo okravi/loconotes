@@ -283,8 +283,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //TODO: switch to registerForActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
         Log.d("debug", "onActivityResult")
+        super.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
             Log.d("debug", "onActivityResult, resultCode: $requestCode")
             if (resultCode == Activity.RESULT_OK) {
@@ -640,7 +641,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
             }
         }
-        //TODO check if this is necessary
+
         val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
 
@@ -656,6 +657,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val adapterPosition = viewHolder.adapterPosition
                 Log.d("debug", "removing viewHolder.adapterPosition at $adapterPosition")
                 adapter.removeAt(adapterPosition)
+                adapter.notifyItemRemoved(adapterPosition+1)
+                adapter.notifyItemRangeChanged(adapterPosition, adapter.itemCount)
+
 
                 //in case previously selected RV was deleted
                 if (selectedNotesRV == adapterPosition){
@@ -665,20 +669,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 if (highlightedMarker == adapterPosition){
                     highlightedMarker = -1
                 }
-
+                //if no items left, show tvNoRecordsAvailable message
                 if (adapter.itemCount < 1 ){
                     binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
                     binding?.rvList?.visibility = View.GONE
                 }
-
-                //TODO:
-                //displaySavedNotesMarkersOnMap()
-                /*
-                getNotesListFromLocalDB()
-
-                 */
-                //listOfSavedNotes.removeAt(adapterPosition)
-                setupNotesListRecyclerView(listOfSavedNotes)
             }
         }
 
@@ -735,8 +730,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
                 val intent = Intent(this@MainActivity, NoteEditActivity::class.java)
                 intent.putExtra(PLACE_DATA, newNote)
+                startActivityForResult(intent, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
 
-                startActivity(intent)
             }
         })
         nearbyPlacesInRecyclerView = true

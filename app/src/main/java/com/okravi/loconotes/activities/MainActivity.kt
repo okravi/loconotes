@@ -656,8 +656,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 val adapterPosition = viewHolder.adapterPosition
                 //removing rv
                 adapter.removeAt(adapterPosition)
-                adapter.notifyItemRemoved(adapterPosition+1)
-                adapter.notifyItemRangeChanged(adapterPosition, adapter.itemCount)
+                //commented out to avoid unintended animation of the last rv, delete this if all ok
+                //adapter.notifyItemRemoved(adapterPosition+1)
+                adapter.notifyItemRangeChanged(adapterPosition+1, adapter.itemCount)
 
                 //in case previously selected RV was deleted
                 if (selectedNotesRV == adapterPosition){

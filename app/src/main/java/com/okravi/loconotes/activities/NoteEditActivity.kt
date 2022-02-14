@@ -68,12 +68,14 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etLongitude?.setText(placeData.placeLongitude)
             //if the note is not custom, showing the saved image
             if (placeData.photoByteArray!!.isNotEmpty()){
-
+                customNote = false
                 val byteArray = placeData.photoByteArray
                 bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
                 binding?.placePhoto?.setImageBitmap(bmp)
+            }else{
+                //to allow saving a note with no photo
+                customNote = true
             }
-
         }
         //getting note data based on the swiped recyclerview position
         if(intent.hasExtra(MainActivity.NOTE_DATA)) {
@@ -136,7 +138,6 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                     Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()
                 } else {
                     //saving default image if there's one
-                        //TODO: crashing with no photo
                     if((savedImagePath == null) && (!customNote)){
 
                         //saving Places image if user did not choose an alternative
@@ -158,44 +159,23 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
                     when {
                         creatingNewNote -> {
-                            Log.d("debug", "creatingNewNote")
                             val addNote = dbHandler.addNote(dbNoteModel)
 
                             if(addNote > 0){
-                                Log.d("debug", "addNote > 0")
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             }
                         }
 
                         !creatingNewNote -> {
-                            Log.d("debug", "!creatingNewNote")
                             val updateNote = dbHandler.updateNote(dbNoteModel)
-
                             if(updateNote > 0){
-                                Log.d("debug", "updateNote > 0")
+
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             }
                         }
-
-                    //}
-/*
-                    when {
-                        !creatingNewNote -> {
-                            Log.d("debug", "!creatingNewNote")
-                            val updateNote = dbHandler.updateNote(dbNoteModel)
-
-                            if(updateNote > 0){
-                                Log.d("debug", "updateNote > 0")
-                                setResult(Activity.RESULT_OK)
-                                finish()
-                            }
-                        }
-
- */
                     }
-
 
                 }
             }
@@ -203,7 +183,7 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("debug", "onActivityResult in NoteEditActivity")
+
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK){
             when (requestCode) {

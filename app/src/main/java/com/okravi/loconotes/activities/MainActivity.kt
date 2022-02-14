@@ -653,7 +653,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 //removing marker of the deleted note
                 listOfSavedNotes[viewHolder.adapterPosition].marker?.remove()
 
-
                 val adapterPosition = viewHolder.adapterPosition
                 //removing rv
                 adapter.removeAt(adapterPosition)
@@ -669,7 +668,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     highlightedMarker = -1
                 }
                 //correcting selected notes rv position
-                if (selectedNotesRV > adapterPosition){
+                if ((selectedNotesRV > adapterPosition) && (selectedNotesRV != -1)){
                     selectedNotesRV -= 1
                 }
                 //if no items left, show tvNoRecordsAvailable message

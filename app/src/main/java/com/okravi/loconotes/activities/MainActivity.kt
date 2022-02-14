@@ -497,8 +497,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         if ((!placesPreloaded) && (parameter == "preloadPlaces")){
 
             if(isLocationEnabled()) {
-                //testing
-                binding?.tvNoRecordsAvailable?.visibility = View.GONE
+
                 lifecycleScope.launch {
                     getListOfLocationsForCurrentPosition("preloadPlaces")
                 }
@@ -747,10 +746,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val dbHandler = DatabaseHandler(this)
         listOfSavedNotes.clear()
         listOfSavedNotes = dbHandler.getNotesList()
-
+        //testing
         if(listOfSavedNotes.size > 0){
-
+            binding?.tvNoRecordsAvailable?.visibility = View.GONE
+            binding?.rvList?.visibility = View.VISIBLE
             sortNotes()
+        }else{
+            binding?.tvNoRecordsAvailable?.visibility = View.VISIBLE
+            binding?.rvList?.visibility = View.GONE
         }
     }
 

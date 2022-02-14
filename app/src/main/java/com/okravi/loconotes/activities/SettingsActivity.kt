@@ -53,7 +53,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        when (readSetting("updatePlaceListMethod")) {
+        when (readSetting("updatePlacesListMethod")) {
             "default" -> {
                 binding?.rbUpdatePlacesListAutomatically?.isChecked = true
             }

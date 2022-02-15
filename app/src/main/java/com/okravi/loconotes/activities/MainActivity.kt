@@ -45,6 +45,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.okravi.loconotes.Constants
 import com.okravi.loconotes.R
 import com.okravi.loconotes.adapters.NearbyPlacesAdapter
 import com.okravi.loconotes.adapters.NotesAdapter
@@ -496,14 +497,16 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         if ((!placesPreloaded) && (parameter == "preloadPlaces")){
 
-            if(isLocationEnabled()) {
+            if(isLocationEnabled() && Constants.isNetworkAvailable(this)) {
 
                 lifecycleScope.launch {
                     getListOfLocationsForCurrentPosition("preloadPlaces")
                 }
 
             }else{
-                Toast.makeText(this, "Please grant the location permissions!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    "Please grant the location permissions and switch on the network access!",
+                    Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -514,17 +517,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         if((!placesPreloaded) && (parameter == "showPlaces")){
 
-            if(isLocationEnabled()) {
+            if((isLocationEnabled()) && Constants.isNetworkAvailable(this)){
 
                 lifecycleScope.launch {
                     getListOfLocationsForCurrentPosition("showPlaces")
                 }
+            }else{
+                Toast.makeText(this,
+                    "Please grant the location permissions and switch on the network access!",
+                    Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun preloadPlaces(){
-
     }
 
     //return highlighted marker back to original state
@@ -746,7 +749,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val dbHandler = DatabaseHandler(this)
         listOfSavedNotes.clear()
         listOfSavedNotes = dbHandler.getNotesList()
-        //testing
+
         if(listOfSavedNotes.size > 0){
             binding?.tvNoRecordsAvailable?.visibility = View.GONE
             binding?.rvList?.visibility = View.VISIBLE

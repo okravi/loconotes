@@ -7,8 +7,6 @@ import android.os.Build
 
 object Constants {
 
-    const val SORT_METHOD = "proximity"
-
     fun isNetworkAvailable(context: Context) : Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as
                 ConnectivityManager

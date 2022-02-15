@@ -13,6 +13,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
@@ -20,6 +21,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,13 +55,12 @@ import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
@@ -107,6 +108,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //displaying splashscreen
+        installSplashScreen().apply {
+            this.setKeepOnScreenCondition {
+                runBlocking {
+                    delay(1200)
+                }
+                false
+                 }
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 

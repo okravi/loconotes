@@ -3,16 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_item_note"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="#EAE8DC"
-        app:cardCornerRadius="3dp"
+        android:layout_height="fill_parent"
+
+
+        android:background="@color/main_background"
+        app:cardCornerRadius="1dp"
         app:cardUseCompatPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
@@ -26,14 +27,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp">
+            android:gravity="center_horizontal"
+
+            android:background="@color/main_foreground"
+            android:padding="5dp">
 
 
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
@@ -41,19 +44,22 @@
 
                 <TextView
                     android:id="@+id/tvNoteTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textColor="@color/main_drawables"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="Name" />
 
                 <TextView
                     android:id="@+id/tvTextNote"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:textSize="15sp"
+                    android:textColor="@color/main_drawables"
+                    android:textSize="14sp"
+
                     tools:text="Description" />
 
             </LinearLayout>
@@ -62,7 +68,7 @@
                 android:id="@+id/iv_item_note"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
-                android:layout_weight="1"
+                android:layout_weight="0.4"
                 app:civ_border_color="@android:color/white"
                 app:civ_border_width="1dp"
                 android:src="@drawable/ic_baseline_settings_24" />

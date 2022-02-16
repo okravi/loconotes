@@ -8,5 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="main_background">#ECECEA</color>
+    <color name="main_background">#e4ebf1</color>
+    <color name="main_foreground">#eff2f9</color>
+    <color name="main_text">#b5bfc6</color>
+    <color name="main_drawables">#6e7f8d</color>
+
 </resources>

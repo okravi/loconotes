@@ -10,6 +10,6 @@
         android:color="#BDBDC7" />
 
     <gradient android:angle="-90"
-        android:startColor="#ECECEA"
-        android:endColor="#ECECEA"  />
+        android:startColor="@color/main_foreground"
+        android:endColor="@color/main_foreground"  />
 </shape>

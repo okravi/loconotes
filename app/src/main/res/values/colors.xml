@@ -2,7 +2,7 @@
 <resources>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
+    <color name="purple_700"></color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
@@ -12,5 +12,6 @@
     <color name="main_foreground">#eff2f9</color>
     <color name="main_text">#b5bfc6</color>
     <color name="main_drawables">#6e7f8d</color>
+    <color name="main_accent">#202942</color>
 
 </resources>

@@ -8,6 +8,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
@@ -20,6 +21,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -609,7 +611,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
 
         notesListInView = true
+        binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
+
         placesListInView = false
+        binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+
 
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = notesAdapter
@@ -639,6 +645,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     notesAdapter.notifyItemChanged(selectedNotesRV)
                 }
                 selectedNotesRV = position
+                Log.d("debug", "selectd notes rv is now:$selectedNotesRV")
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
@@ -716,7 +723,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
 
         notesListInView = false
+        binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_foreground))
         placesListInView = true
+        binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
 
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter

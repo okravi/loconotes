@@ -42,9 +42,16 @@ open class NotesAdapter(
 
             //changing background color of selected/deselected rv
             if (items[position].isSelected){
-                holder.cvItemNote.background.setTint(Color.LTGRAY)
+                //holder.cvItemNote.background.setTint(Color.LTGRAY)
+                //holder.tvNoteTitle?.background?.setTint(Color.LTGRAY)
+                holder.cvItemNote.setBackgroundResource(R.drawable.element_note_highlighted)
+                holder.ivNoteImage.setBackgroundResource(R.color.main_accent)
+                Log.d("debug", "onBindViewHolder, highlighting note:$position")
             }else{
-                holder.cvItemNote.background.setTint(Color.WHITE)
+                //holder.cvItemNote.background.setTint(Color.WHITE)
+                holder.cvItemNote.setBackgroundResource(R.drawable.element_note_default)
+                holder.ivNoteImage.setBackgroundResource(R.color.main_foreground)
+                Log.d("debug", "onBindViewHolder, highlighting note:$position")
             }
 
             holder.itemView.setOnClickListener{

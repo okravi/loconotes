@@ -5,6 +5,8 @@
       <map>
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.23020833333333332" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/button_add_test.xml" value="0.39692307692307693" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_note_default.xml" value="0.2095" />
+        <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_note_highlighted.xml" value="0.2095" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_shape_flat.xml" value="0.23020833333333332" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/element_shape_rounded.xml" value="0.23489583333333333" />
         <entry key="..\:/Kotlin-prodjects-current/loconotes/app/src/main/res/drawable/ic_baseline_add_a_photo_24.xml" value="0.2045" />

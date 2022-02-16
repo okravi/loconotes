@@ -46,7 +46,7 @@
                     android:id="@+id/tvNoteTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/main_drawables"
+                    android:textColor="@color/main_accent"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textSize="16sp"
@@ -69,7 +69,7 @@
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="0.4"
-                app:civ_border_color="@android:color/white"
+                app:civ_border_color="@color/main_drawables"
                 app:civ_border_width="1dp"
                 android:src="@drawable/ic_baseline_settings_24" />
 

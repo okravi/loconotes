@@ -34,6 +34,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.MapStyleOptions.loadRawResourceStyle
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -310,6 +312,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
 
+        // Customise map styling via String resource
+        val success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style))
+
         if (locationPermissionsOK) {
             mMap = googleMap
             mMap.isMyLocationEnabled = true
@@ -340,13 +345,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 }
                 true
             }
-/*
-            //testing preloading places
-            lifecycleScope.launch {
-                kickOffPlaceListSetupProcess("preloadPlaces")
-            }
 
- */
 
         }else{
             checkLocationPermissionsWithDexter()

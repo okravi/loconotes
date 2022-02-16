@@ -13,7 +13,6 @@ import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
@@ -35,7 +34,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -55,12 +53,12 @@ import com.okravi.loconotes.database.DatabaseHandler
 import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
+import com.okravi.loconotes.models.populateProximity
 import kotlinx.coroutines.*
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.math.sqrt
 
@@ -265,7 +263,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
                     lastPositionListUpdatedAt = position
-                    calculateNoteProximityToCurrentLocation()
+                    sortNotes()
                 }
             }
 
@@ -557,6 +555,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         //making sure there's no more than 1 highlighted marker
         if (highlightedMarker != -1){
+            Log.d("debug", "highlightClickedNoteMarkerOnMap, deselecting highlightedMarker:$highlightedMarker")
             listOfSavedNotes[highlightedMarker].marker?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         }
@@ -621,7 +620,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-                Log.d("string", "notesAdapter.setOnClickListener, clicked on $position")
+                Log.d("debug", "notesAdapter.setOnClickListener, clicked on $position")
                 //highlighting clicked on and relevant marker
                 if (!notesList[position].isSelected){
 
@@ -670,7 +669,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 adapter.removeAt(adapterPosition)
                 //commented out to avoid unintended animation of the last rv, delete this if all ok
                 //adapter.notifyItemRemoved(adapterPosition+1)
-                adapter.notifyItemRangeChanged(adapterPosition+1, adapter.itemCount)
+                adapter.notifyItemRangeChanged(0, adapter.itemCount)
 
                 //in case previously selected RV was deleted
                 if (selectedNotesRV == adapterPosition){
@@ -770,43 +769,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
     }
 
-    private fun calculateNoteProximityToCurrentLocation(){
-        //TODO: FIX, current loc is not available yet when this executes
-
-        if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
-
-            val mLatitude = currentLocation!!.latitude.toFloat()
-            val mLongitude = currentLocation!!.longitude.toFloat()
-            for (note in listOfSavedNotes){
-
-                val noteLatitude = note.placeLatitude.toFloat()
-                val noteLongitude = note.placeLongitude.toFloat()
-
-                val a = (mLatitude.minus(noteLatitude)).times(mLatitude.minus(noteLatitude))
-                val b = (mLongitude.minus(noteLongitude)).times(mLongitude.minus(noteLongitude))
-                val distance = sqrt(a.plus(b))
-
-                note.proximity = distance
-            }
-
-            listOfSavedNotes.sortWith(compareBy { it.proximity })
-
-            setupNotesListRecyclerView(listOfSavedNotes)
-
-        }else{
-            return
-        }
-    }
-
     //sorting notes based on saved settings
     private fun sortNotes(){
         when (readSetting("sortOrder")) {
-            "default" -> {
-                calculateNoteProximityToCurrentLocation()
-            }
-            "proximity" -> {
+//testing
+            "default1" -> {
+                if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
 
-                calculateNoteProximityToCurrentLocation()
+                    for (note in listOfSavedNotes){
+                        populateProximity(note, currentLocation!!)
+                    }
+
+                    listOfSavedNotes.sortWith(compareBy { it.proximity })
+                    setupNotesListRecyclerView(listOfSavedNotes)
+                }
+            }
+            "proximity", "default" -> {
+
+                if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
+
+                    for (note in listOfSavedNotes){
+                        populateProximity(note, currentLocation!!)
+                    }
+
+                    listOfSavedNotes.sortWith(compareBy { it.proximity })
+                    setupNotesListRecyclerView(listOfSavedNotes)
+                }
             }
             "placeName" -> {
                 listOfSavedNotes.sortWith(

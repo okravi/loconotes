@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.Loconotes.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#202020</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_baseline_settings_24</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_loconotes_logo_v2</item>
         <item name="postSplashScreenTheme">@style/Theme.Loconotes</item>
     </style>
 </resources>

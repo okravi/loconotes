@@ -273,7 +273,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
             //updating places list if enough time has passed and user moved far enough
             if ((updatePlacesListMethod == "automatic") &&
-                placesListInView){
+                placesListInView &&
+                (::lastPositionListUpdatedAt.isInitialized)) {
 
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
@@ -315,7 +316,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onMapReady(googleMap: GoogleMap) {
 
         // Customise map styling via String resource
-        val success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style))
+        googleMap.setMapStyle(loadRawResourceStyle(this, R.raw.maps_style))
 
         if (locationPermissionsOK) {
             mMap = googleMap

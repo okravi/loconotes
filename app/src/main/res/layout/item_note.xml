@@ -33,13 +33,15 @@
             android:padding="5dp">
 
 
-
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="0dp"
+                android:background="@drawable/element_note_inner_outlined"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="5dp"
+                android:padding="1dp"
                 android:layout_weight="1"
+                android:layout_gravity="top"
                 android:orientation="vertical">
 
                 <TextView
@@ -56,14 +58,32 @@
 
                 <TextView
                     android:id="@+id/tvTextNote"
+                    android:layout_below="@id/tvNoteTitle"
+                    android:padding="2dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/main_drawables"
                     android:textSize="14sp"
-
                     tools:text="Description" />
 
-            </LinearLayout>
+                <TextView
+
+                    android:id="@+id/tvDateNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/main_drawables"
+                    android:textSize="14sp"
+                    android:text="14 May 2020"
+                    android:gravity="end"
+                    android:padding="2dp"
+                    android:paddingEnd="3dp"
+                    android:layout_alignParentBottom="true"
+
+                    tools:text="14 May 2020" />
+
+            </RelativeLayout>
+
+
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/iv_item_note"

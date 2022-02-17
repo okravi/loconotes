@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/main_background"
     tools:context=".activities.SettingsActivity">
 
     <LinearLayout
@@ -14,8 +15,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.9"
         android:background="@drawable/outlined_flat_background"
-        app:backgroundTint="@color/main_background"
+        app:backgroundTint="@color/main_foreground"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -27,36 +29,83 @@
             android:id="@+id/tvSettingsSortOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="9dp"
+            android:paddingTop="9dp"
+            android:textColor="@color/main_accent"
+            android:background="@color/main_text"
+            android:textSize="16sp"
             android:textAlignment="center"
-            android:textColor="@color/black"
-            android:textSize="15sp"
             android:textStyle="bold"
-            android:text="Sort notes based on"
-             />
+            android:text = "Sort notes by:"/>
 
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp">
-            <RadioButton android:id="@+id/rb_sort_by_proximity"
-                android:layout_width="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RadioButton
+                android:id="@+id/rb_sort_by_proximity"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
                 android:text="Note proximity to current location"
-                android:onClick="onRadioButtonClicked"/>
-            <RadioButton android:id="@+id/rb_sort_by_name"
-                android:layout_width="wrap_content"
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
+
+            <RadioButton
+                android:id="@+id/rb_sort_by_name"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
                 android:text="Alphabet order"
-                android:onClick="onRadioButtonClicked"/>
-            <RadioButton android:id="@+id/rb_sort_by_date_modified"
-                android:layout_width="wrap_content"
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
+
+            <RadioButton
+                android:id="@+id/rb_sort_by_date_modified"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
                 android:text="Most recent on top"
-                android:onClick="onRadioButtonClicked"/>
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
+
         </RadioGroup>
 
     </LinearLayout>
+
+
 
     <LinearLayout
 
@@ -68,7 +117,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.9"
         android:background="@drawable/outlined_flat_background"
-        app:backgroundTint="@color/main_background"
+        app:backgroundTint="@color/main_foreground"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -76,34 +125,69 @@
         android:orientation="vertical"
         android:elevation="8dp">
 
-            <TextView
-                android:id="@+id/tvSettingsUpdateFrequency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textAlignment="center"
-                android:textStyle="bold"
-                android:text = "Notes update method"/>
-
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        <TextView
+            android:id="@+id/tvSettingsUpdateFrequency"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="9dp"
+            android:paddingTop="9dp"
+            android:textColor="@color/main_accent"
+            android:background="@color/main_text"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:textStyle="bold"
+            android:text = "Saved notes update method"/>
+
+        <RadioGroup
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp">
-            <RadioButton android:id="@+id/rb_update_notes_list_automatically"
-                android:layout_width="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <RadioButton
+                android:id="@+id/rb_update_notes_list_automatically"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
                 android:text="Auto update notes list when moving"
-                android:onClick="onRadioButtonClicked"/>
-            <RadioButton android:id="@+id/rb_update_notes_list_manually"
-                android:layout_width="wrap_content"
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
+
+            <RadioButton
+                android:id="@+id/rb_update_notes_list_manually"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
                 android:text="Update note list manually"
-                android:onClick="onRadioButtonClicked"/>
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
 
         </RadioGroup>
-
     </LinearLayout>
 
     <LinearLayout
@@ -116,7 +200,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_percent="0.9"
         android:background="@drawable/outlined_flat_background"
-        app:backgroundTint="@color/main_background"
+        app:backgroundTint="@color/main_foreground"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -125,33 +209,68 @@
         android:elevation="8dp">
 
         <TextView
-            android:id="@+id/tvSettingsNearbyPlacesUpdate"
+            android:id="@+id/tvSettingsNearbyPlacesUpdateTEST"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="15sp"
+            android:paddingBottom="9dp"
+            android:paddingTop="9dp"
+            android:textColor="@color/main_accent"
+            android:background="@color/main_text"
+            android:textSize="16sp"
             android:textAlignment="center"
             android:textStyle="bold"
-            android:text = "Places Update Method"/>
+            android:text = "Nearby places update method"/>
 
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        <RadioGroup
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:layout_marginLeft="10dp">
-            <RadioButton android:id="@+id/rb_update_places_list_automatically"
-                android:layout_width="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <RadioButton
+                android:id="@+id/rb_update_places_list_automatically"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
-                android:text="Auto update notes list when moving"
-                android:onClick="onRadioButtonClicked"/>
-            <RadioButton android:id="@+id/rb_update_places_list_manually"
-                android:layout_width="wrap_content"
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
+                android:text="Auto update places when moving"
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
+
+            <RadioButton
+                android:id="@+id/rb_update_places_list_manually"
+                android:layout_width="match_parent"
+                android:gravity="center_vertical"
                 android:layout_height="wrap_content"
-                android:text="Update note list manually"
-                android:onClick="onRadioButtonClicked"/>
+                android:background="@drawable/radio_flat_selector"
+                android:button="@android:color/transparent"
+                android:paddingLeft="16dp"
+                android:paddingTop="3dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="3dp"
+                android:text="Update places list manually"
+                android:textSize="14sp"
+                android:onClick="onRadioButtonClicked"
+                android:textColor="@drawable/radio_flat_text_selector" />
 
         </RadioGroup>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

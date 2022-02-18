@@ -37,7 +37,8 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:gravity="center"
-                tools:text="Nearby place name" />
+                android:text="Add a custom place"
+                 />
 
 
             <de.hdodenhof.circleimageview.CircleImageView

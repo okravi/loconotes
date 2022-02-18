@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -32,7 +33,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 private var binding : ActivityNoteEditBinding? = null
 
@@ -63,15 +66,45 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 MainActivity.PLACE_DATA) as LocationNoteModel
 
             //displaying place data sent from MainActivity
+            Log.d("debug", "placeData.placeName:${placeData.placeName}")
             binding?.etPlaceName?.setText(placeData.placeName)
-            binding?.etLatitude?.setText(placeData.placeLatitude)
-            binding?.etLongitude?.setText(placeData.placeLongitude)
+            binding?.etLatitude?.setText("Lat:${placeData.placeLatitude}")
+            binding?.etLongitude?.setText("Lon:${placeData.placeLongitude}")
+
+            val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+            val netDate = Calendar.getInstance().timeInMillis
+            val date = sdf.format(netDate)
+
+            binding?.etDateModified?.setText(date.toString())
+
             //if the note is not custom, showing the saved image
             if (placeData.photoByteArray!!.isNotEmpty()){
                 customNote = false
                 val byteArray = placeData.photoByteArray
                 bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+
+                //testing
+                val pictureWidth = bmp.getWidth()
+                val pictureHeight = bmp.getHeight()
+                Log.d("debug", "pictureHeight: $pictureHeight, pictureWidth:$pictureWidth")
+                val pictureSidesRatio : Float = pictureHeight.toFloat() / pictureWidth.toFloat()
+                val imageViewWidth = (pictureSidesRatio).toInt()
+                Log.d("debug", "imageWidth:$imageViewWidth")
+
+                Log.d("debug:", "250dp in px is ${250.toInt().toDP(this)}")
+
+                val neededHeightInPx = 250.toInt().toDP(this)
+
+                //binding?.placePhoto?.layoutParams?.width = imageViewWidth.toPx(this)
+                binding?.photoWidget?.layoutParams?.width = (neededHeightInPx / pictureSidesRatio).roundToInt()
+                binding?.photoWidget?.layoutParams?.height = neededHeightInPx
+
+
+
+
                 binding?.placePhoto?.setImageBitmap(bmp)
+
+
             }else{
                 //to allow saving a note with no photo
                 customNote = true
@@ -93,6 +126,12 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             binding?.etLongitude?.setText(noteFromDB[0].placeLongitude)
             binding?.etNote?.setText(noteFromDB[0].textNote)
 
+            val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+            val netDate = Date(noteFromDB[0].dateNoteLastModified)
+            val date = sdf.format(netDate)
+
+            binding?.etDateModified?.setText(date.toString())
+
             val noteUri = noteFromDB[0].photo.toUri()
 
             //if there's a valid URI, show saved photo
@@ -107,6 +146,11 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             savedImagePath = noteFromDB[0].photo.toUri()
         }
     }
+
+    //convert px tp dp
+    private fun Int.toDP(context: Context) = this *
+            context.resources.displayMetrics.densityDpi /
+            DisplayMetrics.DENSITY_DEFAULT
 
     override fun onResume() {
         super.onResume()

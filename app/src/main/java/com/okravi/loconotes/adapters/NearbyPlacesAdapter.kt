@@ -35,7 +35,8 @@ class NearbyPlacesAdapter(
             //displaying an image placeholder for the first place rv
             if (position == 0){
                 holder.ivNearbyPlacePhoto.setImageResource(
-                    R.drawable.ic_custom_rv_note_image_placeholder)
+                    R.drawable.ic_custom_rv_note_image_placeholder_round)
+                holder.tvNearbyPlaceName.setText("Add a custom place")
             }
 
             if(model.photo != null){

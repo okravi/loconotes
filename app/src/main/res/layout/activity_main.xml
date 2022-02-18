@@ -122,7 +122,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.62"
-            android:background="@drawable/element_shape_rounded"
+            android:background="@drawable/outlined_flat_background"
             app:backgroundTint="@color/main_background"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"

@@ -15,7 +15,11 @@ import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.okravi.loconotes.R
 import com.okravi.loconotes.activities.MainActivity
+
 import com.okravi.loconotes.database.DatabaseHandler
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 open class NotesAdapter(
     private val context: Context,
@@ -39,6 +43,12 @@ open class NotesAdapter(
             holder.tvNoteTitle.text = model.placeName
             holder.tvTextNote.text = model.textNote
             holder.ivNoteImage.setImageURI(model.photo.toUri())
+
+            val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+            val netDate = Date(model.dateNoteLastModified)
+            val date = sdf.format(netDate)
+
+            holder.tvDateModified.text = date
 
             //changing background color of selected/deselected rv
             if (items[position].isSelected){
@@ -105,6 +115,7 @@ open class NotesAdapter(
         var tvTextNote = binding.tvTextNote
         var ivNoteImage = binding.ivItemNote
         var cvItemNote = binding.cvItemNote
+        var tvDateModified = binding.tvDateNote
     }
 }
 

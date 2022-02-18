@@ -48,20 +48,20 @@
                     android:id="@+id/tvNoteTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/main_accent"
-                    android:background="@color/main_text"
                     android:layout_gravity="center"
+                    android:background="@color/main_text"
                     android:gravity="center"
+                    android:textColor="@color/main_accent"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     tools:text="Name" />
 
                 <TextView
                     android:id="@+id/tvTextNote"
-                    android:layout_below="@id/tvNoteTitle"
-                    android:padding="2dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/tvNoteTitle"
+                    android:padding="2dp"
                     android:textColor="@color/main_drawables"
                     android:textSize="14sp"
                     tools:text="Description" />
@@ -71,13 +71,12 @@
                     android:id="@+id/tvDateNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/main_drawables"
-                    android:textSize="14sp"
-                    android:text="14 May 2020"
+                    android:layout_alignParentBottom="true"
                     android:gravity="end"
                     android:padding="2dp"
                     android:paddingEnd="3dp"
-                    android:layout_alignParentBottom="true"
+                    android:textColor="@color/main_drawables"
+                    android:textSize="14sp"
 
                     tools:text="14 May 2020" />
 

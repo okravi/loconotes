@@ -8,6 +8,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -18,6 +19,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -83,24 +85,15 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 val byteArray = placeData.photoByteArray
                 bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
 
-                //testing
+                //calculating size of the view to display photo
                 val pictureWidth = bmp.getWidth()
                 val pictureHeight = bmp.getHeight()
-                Log.d("debug", "pictureHeight: $pictureHeight, pictureWidth:$pictureWidth")
                 val pictureSidesRatio : Float = pictureHeight.toFloat() / pictureWidth.toFloat()
-                val imageViewWidth = (pictureSidesRatio).toInt()
-                Log.d("debug", "imageWidth:$imageViewWidth")
-
-                Log.d("debug:", "250dp in px is ${250.toInt().toDP(this)}")
 
                 val neededHeightInPx = 250.toInt().toDP(this)
 
-                //binding?.placePhoto?.layoutParams?.width = imageViewWidth.toPx(this)
                 binding?.photoWidget?.layoutParams?.width = (neededHeightInPx / pictureSidesRatio).roundToInt()
                 binding?.photoWidget?.layoutParams?.height = neededHeightInPx
-
-
-
 
                 binding?.placePhoto?.setImageBitmap(bmp)
 
@@ -122,8 +115,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
             //Displaying Note
             binding?.etPlaceName?.setText(noteFromDB[0].placeName)
-            binding?.etLatitude?.setText(noteFromDB[0].placeLatitude)
-            binding?.etLongitude?.setText(noteFromDB[0].placeLongitude)
+            binding?.etLatitude?.setText("Lat:${noteFromDB[0].placeLatitude}")
+            binding?.etLongitude?.setText("Lon:${noteFromDB[0].placeLongitude}")
             binding?.etNote?.setText(noteFromDB[0].textNote)
 
             val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
@@ -136,6 +129,21 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
             //if there's a valid URI, show saved photo
             if (noteFromDB[0].photo.length > 5 ){
+                //calculating size of the view to display photo
+                val formattedUri =  Uri.parse("file://" + noteUri)
+                val inputStream = contentResolver.openInputStream(formattedUri)
+                val bmp = BitmapFactory.decodeStream(inputStream)
+
+                val pictureWidth = bmp?.width
+                val pictureHeight = bmp?.height
+
+                val pictureSidesRatio : Float = pictureHeight!!.toFloat() / pictureWidth!!.toFloat()
+                val neededHeightInPx = 250.toInt().toDP(this)
+
+                binding?.photoWidget?.layoutParams?.width = (neededHeightInPx / pictureSidesRatio).roundToInt()
+                binding?.photoWidget?.layoutParams?.height = neededHeightInPx
+
+                //displaying photo
                 binding?.placePhoto?.setImageURI(noteUri)
             //else show a placeholder
             }else{

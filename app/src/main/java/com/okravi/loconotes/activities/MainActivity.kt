@@ -297,11 +297,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //TODO: switch to registerForActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("debug", "onActivityResult")
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
-            Log.d("debug", "onActivityResult, resultCode: $requestCode")
             if (resultCode == Activity.RESULT_OK) {
 
                 getNotesListFromLocalDB()
@@ -563,7 +561,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         //making sure there's no more than 1 highlighted marker
         if (highlightedMarker != -1){
-            Log.d("debug", "highlightClickedNoteMarkerOnMap, deselecting highlightedMarker:$highlightedMarker")
             listOfSavedNotes[highlightedMarker].marker?.setIcon(
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         }
@@ -613,6 +610,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
+
         //highlighting list notes button after saving new note
         if (placesListInView){
             binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
@@ -625,8 +623,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         notesListInView = true
         placesListInView = false
 
-
-
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = notesAdapter
 
@@ -635,7 +631,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         notesAdapter.setOnClickListener(object : NotesAdapter.OnClickListener{
             override fun onClick(position: Int, model: dbNoteModel) {
-                Log.d("debug", "notesAdapter.setOnClickListener, clicked on $position")
                 //highlighting clicked on and relevant marker
                 if (!notesList[position].isSelected){
 
@@ -655,7 +650,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     notesAdapter.notifyItemChanged(selectedNotesRV)
                 }
                 selectedNotesRV = position
-                Log.d("debug", "selectd notes rv is now:$selectedNotesRV")
             }
         })
         binding?.rvList?.scheduleLayoutAnimation()
@@ -787,40 +781,34 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //sorting notes based on saved settings
     private fun sortNotes(){
+
         when (readSetting("sortOrder")) {
-//testing
-            "default1" -> {
-                if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
 
-                    for (note in listOfSavedNotes){
-                        populateProximity(note, currentLocation!!)
-                    }
-
-                    listOfSavedNotes.sortWith(compareBy { it.proximity })
-                    setupNotesListRecyclerView(listOfSavedNotes)
-                }
-            }
             "proximity", "default" -> {
-
-                if ((listOfSavedNotes.size > 0) && (currentLocation != null)){
-
-                    for (note in listOfSavedNotes){
+                if (currentLocation != null) {
+                    //current location is available, sorting accordingly
+                    for (note in listOfSavedNotes) {
                         populateProximity(note, currentLocation!!)
                     }
-
                     listOfSavedNotes.sortWith(compareBy { it.proximity })
                     setupNotesListRecyclerView(listOfSavedNotes)
-                }
+                }else{
+                    //current location not available, falling back to alphabet order
+                        listOfSavedNotes.sortWith(
+                            compareBy { it.placeName })
+                        setupNotesListRecyclerView(listOfSavedNotes)
+                    }
             }
+
             "placeName" -> {
                 listOfSavedNotes.sortWith(
                     compareBy { it.placeName })
                 setupNotesListRecyclerView(listOfSavedNotes)
             }
+
             "dateModified" -> {
                 listOfSavedNotes.sortWith(
                     compareBy<dbNoteModel> { it.dateNoteLastModified }.reversed())
-
                 setupNotesListRecyclerView(listOfSavedNotes)
             }
         }

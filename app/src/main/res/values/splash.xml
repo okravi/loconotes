@@ -2,7 +2,7 @@
 <resources>
     <style name="Theme.Loconotes.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/main_accent</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_loconotes_logo_v2</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_loconotes_logo_v3</item>
         <item name="postSplashScreenTheme">@style/Theme.Loconotes</item>
     </style>
 </resources>

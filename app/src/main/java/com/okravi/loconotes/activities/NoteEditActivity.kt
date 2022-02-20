@@ -70,8 +70,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             //displaying place data sent from MainActivity
             Log.d("debug", "placeData.placeName:${placeData.placeName}")
             binding?.etPlaceName?.setText(placeData.placeName)
-            binding?.etLatitude?.setText("Lat:${placeData.placeLatitude}")
-            binding?.etLongitude?.setText("Lon:${placeData.placeLongitude}")
+            binding?.etLatitude?.setText(placeData.placeLatitude)
+            binding?.etLongitude?.setText(placeData.placeLongitude)
 
             val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
             val netDate = Calendar.getInstance().timeInMillis
@@ -115,8 +115,8 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
 
             //Displaying Note
             binding?.etPlaceName?.setText(noteFromDB[0].placeName)
-            binding?.etLatitude?.setText("Lat:${noteFromDB[0].placeLatitude}")
-            binding?.etLongitude?.setText("Lon:${noteFromDB[0].placeLongitude}")
+            binding?.etLatitude?.setText(noteFromDB[0].placeLatitude)
+            binding?.etLongitude?.setText(noteFromDB[0].placeLongitude)
             binding?.etNote?.setText(noteFromDB[0].textNote)
 
             val sdf = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
@@ -183,8 +183,6 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
             {
                 //if some fields are not filled show toast
                 if ((binding?.etPlaceName?.text.isNullOrEmpty() ||
-                            binding?.etLatitude?.text.isNullOrEmpty() ||
-                            binding?.etLongitude?.text.isNullOrEmpty() ||
                             binding?.etNote?.text.isNullOrEmpty())
                 ) {
                     Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show()

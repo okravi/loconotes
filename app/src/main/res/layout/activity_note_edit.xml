@@ -123,7 +123,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
                 android:background="@drawable/element_note_inner_outlined"
+                android:backgroundTint="@color/main_background"
                 android:gravity="center"
                 android:textColor="@color/main_accent"
                 android:textSize="14sp"
@@ -138,16 +141,39 @@
                >
 
                 <TextView
-                    android:id="@+id/et_latitude"
-                    android:layout_weight="1"
+                    android:layout_weight="0.3"
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:gravity="center"
                     android:textColor="@color/main_accent"
+                    android:textSize="14sp"
+                    android:text="Lat:"
+                    />
+
+                <TextView
+                    android:id="@+id/et_latitude"
+                    android:layout_weight="1"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="left"
+                    android:textColor="@color/main_accent"
                     android:background="@drawable/element_note_inner_outlined"
+                    android:backgroundTint="@color/main_background"
                     android:textSize="14sp"
                     tools:text="latitude"/>
+
+                <TextView
+                    android:layout_weight="0.3"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:textColor="@color/main_accent"
+                    android:textSize="14sp"
+                    android:text="Long: "
+                    />
 
                 <TextView
                     android:id="@+id/et_longitude"
@@ -155,10 +181,12 @@
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:gravity="center"
+                    android:layout_marginEnd="1dp"
+                    android:gravity="left"
                     android:textColor="@color/main_accent"
-                    android:textSize="14sp"
                     android:background="@drawable/element_note_inner_outlined"
+                    android:backgroundTint="@color/main_background"
+                    android:textSize="14sp"
                     tools:text="longitude"/>
 
             </LinearLayout>
@@ -170,6 +198,8 @@
                 android:gravity="top"
                 android:layout_weight="1"
                 android:hint="Write a note here"
+                android:paddingStart="3dp"
+                android:paddingEnd="3dp"
                 android:background="@color/main_text"
                 android:textColor="@color/main_accent"
                 android:textSize="14sp"

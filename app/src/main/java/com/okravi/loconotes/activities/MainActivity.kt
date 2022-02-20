@@ -487,9 +487,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             binding?.btnAddNote?.id -> {
 
                 kickOffPlaceListSetupProcess("showPlaces")
+
+                binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
+                binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
             }
 
             binding?.btnListNotes?.id -> {
+                //hoghlighting pressed ListNotes button
+                binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+                binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
 
                 getNotesListFromLocalDB()
                 kickOffPlaceListSetupProcess("preloadPlaces")
@@ -607,15 +613,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun setupNotesListRecyclerView(notesList: ArrayList<dbNoteModel>) {
+        //highlighting list notes button after saving new note
+        if (placesListInView){
+            binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+            binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
+        }
 
         binding?.rvList?.layoutManager = LinearLayoutManager(this@MainActivity)
         notesAdapter = NotesAdapter(items = notesList, context = this@MainActivity)
 
         notesListInView = true
-        binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
-
         placesListInView = false
-        binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+
 
 
         binding?.rvList?.setHasFixedSize(true)
@@ -724,9 +733,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)
 
         notesListInView = false
-        binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_foreground))
         placesListInView = true
-        binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
 
         binding?.rvList?.setHasFixedSize(true)
         binding?.rvList?.adapter = nearbyPlacesAdapter

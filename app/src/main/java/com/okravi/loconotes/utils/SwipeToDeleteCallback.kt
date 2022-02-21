@@ -3,10 +3,12 @@ package pl.kitek.rvswipetodelete
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.okravi.loconotes.R
+import com.okravi.loconotes.adapters.NearbyPlacesAdapter
 
 abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
@@ -26,7 +28,12 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
          * if (viewHolder?.adapterPosition == 0) return 0
          */
         //if (viewHolder.adapterPosition == 0) return 0
-        return super.getMovementFlags(recyclerView, viewHolder)
+        //if (viewHolder. == NearbyPlacesAdapter().returnItemType()) return 0
+        if (recyclerView.adapter.toString().contains("Places")){
+            return 0
+        }else{
+            return super.getMovementFlags(recyclerView, viewHolder)
+        }
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {

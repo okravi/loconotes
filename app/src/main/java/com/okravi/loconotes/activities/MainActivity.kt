@@ -662,7 +662,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
             }
         }
-
+        Log.d("debug", "attaching ItemTouchHandler to rv")
         editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
 
@@ -724,9 +724,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
-        //making sure swipe functionality is disabled for places
-        editItemTouchHandler.attachToRecyclerView(null)
-        deleteItemTouchHandler.attachToRecyclerView(null)
 
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)

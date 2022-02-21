@@ -95,6 +95,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private var updateNoteListMethod: String? = "default"
     private var sortOrder: String? = "default"
     private var placesPreloaded = false
+    //condition for showing splashscreen
+    private var stillShowingSplashScreen = true
+
+    private lateinit var deleteItemTouchHandler : ItemTouchHelper
+    private lateinit var editItemTouchHandler : ItemTouchHelper
 
     private lateinit var lastPositionListUpdatedAt : LatLng
     private var lastTimeListAutoUpdatedBasedOnUserLocation: Long = 0
@@ -113,10 +118,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         //displaying splashscreen
         installSplashScreen().apply {
             this.setKeepOnScreenCondition {
-                runBlocking {
-                    delay(1200)
-                }
-                false
+                stillShowingSplashScreen
                  }
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -144,8 +146,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         binding?.btnListNotes?.
         animate()?.alpha(1f)?.translationXBy(-250F)?.setStartDelay(50)?.duration = 1100
     }
-
-
 
     //Checking if location service is enabled on the device
     private fun isLocationEnabled(): Boolean {
@@ -313,6 +313,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
 
+        stillShowingSplashScreen = false
+
         // Customise map styling via String resource
         googleMap.setMapStyle(loadRawResourceStyle(this, R.raw.maps_style))
 
@@ -369,8 +371,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
         //to let the same item be selected again when user gets back to the MainActivity
         selectedNotesRV = -1
-
-
     }
 
     //Getting a list of locations closest to the user's current location. Permissions already checked.
@@ -663,8 +663,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         }
 
-        val editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
+        editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
+
 
 
         val deleteSwipeHandler = object : SwipeToDeleteCallback(this){
@@ -701,8 +702,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
         }
 
-        val deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
+        deleteItemTouchHandler = ItemTouchHelper(deleteSwipeHandler)
         deleteItemTouchHandler.attachToRecyclerView(binding?.rvList)
+
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
@@ -722,6 +724,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
+        //making sure swipe functionality is disabled for places
+        editItemTouchHandler.attachToRecyclerView(null)
+        deleteItemTouchHandler.attachToRecyclerView(null)
 
         binding?.rvList?.layoutManager = StaggeredGridLayoutManager(2, 1)
         val nearbyPlacesAdapter = NearbyPlacesAdapter(items = nearbyPlaceList)

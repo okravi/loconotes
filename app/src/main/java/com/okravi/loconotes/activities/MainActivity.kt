@@ -242,21 +242,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     private val mLocationCallBack = object : LocationCallback(){
 
         override fun onLocationResult(locationResult: LocationResult){
-
             //TODO: this may be possible to simplify
             currentLocation = locationResult.lastLocation
             val mLatitude = currentLocation!!.latitude
             val mLongitude = currentLocation!!.longitude
             val position = LatLng(mLatitude, mLongitude)
 
+            //preloading places upon the launch of the app
             if ((initialLocationResult) &&
-                (sortOrder == "proximity") &&
+                //((sortOrder == "proximity") || (sortOrder == "default")) &&
                 notesListInView){
 
                 lastPositionListUpdatedAt = position
                 getNotesListFromLocalDB()
                 initialLocationResult = false
-
                 kickOffPlaceListSetupProcess("preloadPlaces")
             }
             //updating notes list if enough time has passed and user moved far enough
@@ -312,17 +311,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //Displaying users location on the map. Permission status saved to $locationPermissionsOK
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-
-        stillShowingSplashScreen = false
-
         // Customise map styling via String resource
         googleMap.setMapStyle(loadRawResourceStyle(this, R.raw.maps_style))
+        stillShowingSplashScreen = false
+
 
         if (locationPermissionsOK) {
             mMap = googleMap
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
+
 
             //reading the db and setting up the notes rv
             if(sortOrder != "proximity"){
@@ -662,7 +661,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 adapter.notifyEditItem(this@MainActivity, viewHolder.adapterPosition, NOTE_EDIT_ACTIVITY_REQUEST_CODE)
             }
         }
-        Log.d("debug", "attaching ItemTouchHandler to rv")
+
         editItemTouchHandler = ItemTouchHelper(editSwipeHandler)
         editItemTouchHandler.attachToRecyclerView(binding?.rvList)
 

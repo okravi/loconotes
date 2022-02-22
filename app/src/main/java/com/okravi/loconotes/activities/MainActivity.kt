@@ -8,16 +8,18 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +38,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MapStyleOptions.loadRawResourceStyle
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
@@ -58,13 +59,15 @@ import com.okravi.loconotes.databinding.ActivityMainBinding
 import com.okravi.loconotes.models.LocationNoteModel
 import com.okravi.loconotes.models.dbNoteModel
 import com.okravi.loconotes.models.populateProximity
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.kitek.rvswipetodelete.SwipeToDeleteCallback
 import pl.kitek.rvswipetodelete.SwipeToEditCallback
 import java.io.ByteArrayOutputStream
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.sqrt
+
 
 private var binding : ActivityMainBinding? = null
 private const val sharedPrefFile = "loconotesSettings"
@@ -121,6 +124,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                 stillShowingSplashScreen
                  }
         }
+        //setting up status bar color
+        val window = window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.rgb(181, 191, 198)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
@@ -181,6 +189,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                         locationPermissionsOK = true
                         //getting user location
                         getFusedUserLocation()
+                        stillShowingSplashScreen = false
+                    }else{
+                        Toast.makeText(this@MainActivity,
+                            "Sorry, you have to enable location permission for the app to work properly",
+                            Toast.LENGTH_LONG).show()
+                        stillShowingSplashScreen = false
                     }
                 }
 
@@ -211,6 +225,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             .setNegativeButton("Cancel") { dialog,
                                            _ ->
                 dialog.dismiss()
+
             }.show()
     }
 
@@ -297,7 +312,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //TODO: switch to registerForActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        stillShowingSplashScreen = false
         if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
 
@@ -707,19 +722,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
-    }
-
-    //Making sure the location gets displayed on the map if user gives back the location permissions
-    override fun onStart() {
-        super.onStart()
-        /*
-        if(locationPermissionsOK){
-            getFusedUserLocation()
-            val mapFragment =
-                supportFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment?
-            mapFragment!!.getMapAsync(this)
-        }
-         */
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {

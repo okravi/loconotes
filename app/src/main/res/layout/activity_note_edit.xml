@@ -8,7 +8,6 @@
     android:background="@color/main_background">
 
     <LinearLayout
-
         android:id="@+id/llTop"
         android:layout_height="0dp"
         android:layout_width="0dip"
@@ -84,10 +83,9 @@
             android:src="@drawable/ic_baseline_add_a_photo_24"
             android:elevation="10dp"
             android:layout_weight="1"/>
-
     </LinearLayout>
-    <LinearLayout
 
+    <LinearLayout
         android:id="@+id/llBottom"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -114,7 +112,7 @@
                 android:textColor="@color/main_accent"
                 android:background="@color/main_text"
                 android:textSize="16sp"
-                android:hint="Place name"
+                android:hint="@string/note_edit_place_name_hint"
                 android:textStyle="bold"
                 />
 
@@ -148,7 +146,7 @@
                     android:gravity="center"
                     android:textColor="@color/main_accent"
                     android:textSize="14sp"
-                    android:text="Lat:"
+                    android:text="@string/note_edit_lat"
                     />
 
                 <TextView
@@ -157,7 +155,7 @@
                     android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:textColor="@color/main_accent"
                     android:background="@drawable/element_note_inner_outlined"
                     android:backgroundTint="@color/main_background"
@@ -172,7 +170,7 @@
                     android:gravity="center"
                     android:textColor="@color/main_accent"
                     android:textSize="14sp"
-                    android:text="Long: "
+                    android:text="@string/note_edit_long"
                     />
 
                 <TextView
@@ -182,7 +180,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginEnd="1dp"
-                    android:gravity="left"
+                    android:gravity="start"
                     android:textColor="@color/main_accent"
                     android:background="@drawable/element_note_inner_outlined"
                     android:backgroundTint="@color/main_background"
@@ -197,14 +195,12 @@
                 android:layout_height="0dip"
                 android:gravity="top"
                 android:layout_weight="1"
-                android:hint="Write a note here"
+                android:hint="@string/note_edit_write_a_note_here_hint"
                 android:paddingStart="3dp"
                 android:paddingEnd="3dp"
                 android:background="@color/main_text"
                 android:textColor="@color/main_accent"
-                android:textSize="14sp"
-                />
-
+                android:textSize="14sp" />
     </LinearLayout>
 
     <ImageButton

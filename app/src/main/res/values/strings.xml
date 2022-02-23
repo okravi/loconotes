@@ -1,5 +1,20 @@
 <resources>
     <string name="app_name">Loconotes</string>
+    <string name="app_version">v 1.0</string>
     <string name="no_records_available_yet">No records available yet :( \n Add something with the ADD Button</string>
-    <string name="btn_add_text">A\nD\nD</string>
+    <string name="note_edit_place_name_hint">Place name</string>
+    <string name="note_edit_lat">Lat:</string>
+    <string name="note_edit_long">Long:</string>
+    <string name="note_edit_write_a_note_here_hint">Write a note here</string>
+    <string name="settings_sort_notes_by">Sort notes by:</string>
+    <string name="settings_sort_notes_note_proximity_to_current_location">Note proximity to current location</string>
+    <string name="settings_sort_notes_alphabet_order">Alphabet order</string>
+    <string name="settings_sort_notes_most_recent_on_top">Most recent on top</string>
+    <string name="settings_saved_notes_update_method">Saved notes update method:</string>
+    <string name="settings_saved_notes_auto_update_notes_list_when_moving">Auto update notes list when moving</string>
+    <string name="settings_saved_notes_update_note_list_manually">Update note list manually</string>
+    <string name="settings_nearby_places_update_method">Nearby places update method:</string>
+    <string name="settings_nearby_places_auto_update_places_when_moving">Auto update places when moving</string>
+    <string name="settings_nearby_places_update_places_list_manually">Update places list manually</string>
+    <string name="item_nearby_place_add_a_custom_place_title">Add a custom place</string>
 </resources>

@@ -4,12 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".activities.MainActivity"
     android:background="@color/main_background">
 
         <LinearLayout
-
             android:id="@+id/llTop"
             android:layout_height="0dp"
             android:layout_width="0dip"
@@ -34,13 +32,10 @@
                     android:layout_marginBottom="3dp"
                     app:cardCornerRadius="1dp"
                     app:cardElevation="8dp"
-
-
                     >
 
                     <fragment
                         android:id="@+id/map_fragment"
-
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -104,15 +99,10 @@
                             android:layout_weight="1"
                             >
                         </ImageButton>
-
-
                 </LinearLayout>
-
-
         </LinearLayout>
 
         <LinearLayout
-
             android:id="@+id/llBottom"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -130,19 +120,14 @@
             android:orientation="vertical"
             android:elevation="8dp">
 
-
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_list"
                     android:background="@color/main_background"
                     android:layout_width="match_parent"
                     android:layout_gravity="center"
-
-
                     android:layout_height="match_parent"
                     android:visibility="gone"
                     tools:visibility="gone"
-
                     android:layoutAnimation="@anim/layout_animation"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     />
@@ -160,5 +145,4 @@
                     android:textSize="16sp" />
 
         </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

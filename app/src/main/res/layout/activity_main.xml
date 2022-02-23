@@ -8,7 +8,6 @@
     tools:context=".activities.MainActivity"
     android:background="@color/main_background">
 
-
         <LinearLayout
 
             android:id="@+id/llTop"

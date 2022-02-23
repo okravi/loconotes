@@ -312,13 +312,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     //TODO: switch to registerForActivityResult
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        stillShowingSplashScreen = false
+
         if (requestCode == NOTE_EDIT_ACTIVITY_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
 
                 getNotesListFromLocalDB()
             } else {
                 Log.e("Activity", "Cancelled or Back Pressed")
+                //hoghlighting pressed ListNotes button
+                binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+                binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
+                getNotesListFromLocalDB()
             }
         }
     }
@@ -328,15 +332,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     override fun onMapReady(googleMap: GoogleMap) {
         // Customise map styling via String resource
         googleMap.setMapStyle(loadRawResourceStyle(this, R.raw.maps_style))
-        stillShowingSplashScreen = false
-
+        //stillShowingSplashScreen = false
 
         if (locationPermissionsOK) {
             mMap = googleMap
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
             mMap.uiSettings.isZoomControlsEnabled = false
-
 
             //reading the db and setting up the notes rv
             if(sortOrder != "proximity"){
@@ -505,10 +507,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
 
             binding?.btnListNotes?.id -> {
-                //hoghlighting pressed ListNotes button
-                binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
-                binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
-
                 getNotesListFromLocalDB()
                 kickOffPlaceListSetupProcess("preloadPlaces")
             }
@@ -522,7 +520,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun kickOffPlaceListSetupProcess(parameter: String){
-
+        Log.d("debug", "parameter:$parameter, placesPreloaded:$placesPreloaded")
         if ((!placesPreloaded) && (parameter == "preloadPlaces")){
 
             if(isLocationEnabled() && Constants.isNetworkAvailable(this)) {
@@ -539,7 +537,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
 
         if((placesPreloaded) && (parameter == "showPlaces")){
-
+            Log.d("debug", "going to set up NearbyPlaces list")
             setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
         }
 
@@ -722,6 +720,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
         binding?.tvNoRecordsAvailable?.visibility = View.GONE
         binding?.rvList?.visibility = View.VISIBLE
+
+        //stillShowingSplashScreen = false
     }
 
     private fun setupNearbyPlacesRecyclerView(nearbyPlaceList: ArrayList<LocationNoteModel>) {
@@ -767,6 +767,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
 
     //reading the whole DB to listOfSavedNotes
     private fun getNotesListFromLocalDB(){
+
+        //hoghlighting pressed ListNotes button
+        binding?.btnAddNote?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_background))
+        binding?.btnListNotes?.background?.setTintList(ContextCompat.getColorStateList(this, R.color.main_accent))
 
         val dbHandler = DatabaseHandler(this)
         listOfSavedNotes.clear()

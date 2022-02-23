@@ -59,7 +59,7 @@ open class DatabaseHandler(context: Context) :
         contentValues.put(KEY_LONGITUDE, note.placeLongitude)
 
         val result = db.insert(TABLE_NOTES, null, contentValues)
-        Log.d("debug", "created note in Database handler, result is:$result")
+
         db.close()
         return result
     }
@@ -83,7 +83,6 @@ open class DatabaseHandler(context: Context) :
             KEY_ID + "=" + note.keyID, null)
 
         db.close()
-        Log.d("debug", "updated note in Database handler, result is:$result")
         return result
     }
 
@@ -128,7 +127,6 @@ open class DatabaseHandler(context: Context) :
 
         }catch (e:SQLiteException){
             db.execSQL(selectQuery)
-            Log.d("excp database:", "caught exception")
             return ArrayList()
         }
         db.close()
@@ -166,7 +164,6 @@ open class DatabaseHandler(context: Context) :
 
         }catch (e:SQLiteException){
             db.execSQL(selectQuery)
-            Log.d("excp database:", "caught exception")
             return ArrayList()
         }
 

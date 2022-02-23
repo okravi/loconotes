@@ -56,17 +56,14 @@ open class NotesAdapter(
                 //holder.tvNoteTitle?.background?.setTint(Color.LTGRAY)
                 holder.cvItemNote.setBackgroundResource(R.drawable.element_note_highlighted)
                 holder.ivNoteImage.setBackgroundResource(R.color.main_accent)
-                Log.d("debug", "onBindViewHolder, highlighting note:$position")
             }else{
                 //holder.cvItemNote.background.setTint(Color.WHITE)
                 holder.cvItemNote.setBackgroundResource(R.drawable.element_note_default)
                 holder.ivNoteImage.setBackgroundResource(R.color.main_foreground)
-                Log.d("debug", "onBindViewHolder, highlighting note:$position")
             }
 
             holder.itemView.setOnClickListener{
                 if(onClickRecyclerListener != null){
-                    Log.d("debug", "holder.itemView.setOnClickListener{: clicked on $position")
                     onClickRecyclerListener!!.onClick(position, model)
                 }
             }
@@ -83,8 +80,6 @@ open class NotesAdapter(
         if(isDeleted > 0){
             items.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
-
-            Log.d("debug", "fun removeAt(adapterPosition: Int):removed at $adapterPosition")
         }
     }
 

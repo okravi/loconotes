@@ -18,7 +18,6 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
     private val backgroundColor = Color.parseColor("#24AE05")
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
-
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
         /**
          * To disable "swipe" for specific item return 0 here.
@@ -76,4 +75,3 @@ abstract class SwipeToEditCallback(context: Context) : ItemTouchHelper.SimpleCal
         c?.drawRect(left, top, right, bottom, clearPaint)
     }
 }
-// END

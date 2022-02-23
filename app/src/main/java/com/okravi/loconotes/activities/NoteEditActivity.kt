@@ -246,6 +246,14 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                             bmp = MediaStore.Images.Media
                                 .getBitmap(this.contentResolver, contentURI)
                             savedImagePath = saveImageToInternalStorage(bmp)
+                            //calculating correct photoWidget size for a photo
+                            val pictureWidth = bmp.width
+                            val pictureHeight = bmp.height
+                            val pictureSidesRatio : Float = pictureHeight.toFloat() / pictureWidth.toFloat()
+                            val neededHeightInPx = 250.toInt().toDP(this)
+                            binding?.photoWidget?.layoutParams?.width = (neededHeightInPx / pictureSidesRatio).roundToInt()
+                            binding?.photoWidget?.layoutParams?.height = neededHeightInPx
+
                             binding?.placePhoto?.setImageBitmap(bmp)
                         }catch (e: IOException){
                             e.printStackTrace()
@@ -258,6 +266,15 @@ class NoteEditActivity : AppCompatActivity(), View.OnClickListener {
                 CAMERA -> {
                    bmp = data!!.extras!!.get("data") as Bitmap
                     savedImagePath = saveImageToInternalStorage(bmp)
+
+                    //calculating correct photoWidget size for a photo
+                    val pictureWidth = bmp.width
+                    val pictureHeight = bmp.height
+                    val pictureSidesRatio : Float = pictureHeight.toFloat() / pictureWidth.toFloat()
+                    val neededHeightInPx = 250.toInt().toDP(this)
+                    binding?.photoWidget?.layoutParams?.width = (neededHeightInPx / pictureSidesRatio).roundToInt()
+                    binding?.photoWidget?.layoutParams?.height = neededHeightInPx
+
                     binding?.placePhoto?.setImageBitmap(bmp)
                 }
             }

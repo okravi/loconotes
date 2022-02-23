@@ -286,10 +286,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
             }
 
             //updating places list if enough time has passed and user moved far enough
-            if ((updatePlacesListMethod == "automatic") &&
+            if (((updatePlacesListMethod == "automatic") || (updatePlacesListMethod == "default")) &&
                 placesListInView &&
                 (::lastPositionListUpdatedAt.isInitialized)) {
-
                 //this condition has to be checked separately!
                 if(isItTimeToAutoUpdateList()){
                     lastPositionListUpdatedAt = position
@@ -480,7 +479,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                     }
                 }
             } else {
-                Log.d("debug", "Place not found")
+                //if no places found
                 val exception = task.exception
                 if (exception is ApiException) {
                     val statusCode = exception.statusCode
@@ -520,7 +519,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
     }
 
     private fun kickOffPlaceListSetupProcess(parameter: String){
-        Log.d("debug", "parameter:$parameter, placesPreloaded:$placesPreloaded")
         if ((!placesPreloaded) && (parameter == "preloadPlaces")){
 
             if(isLocationEnabled() && Constants.isNetworkAvailable(this)) {
@@ -537,7 +535,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
         }
 
         if((placesPreloaded) && (parameter == "showPlaces")){
-            Log.d("debug", "going to set up NearbyPlaces list")
             setupNearbyPlacesRecyclerView(listOfNearbyPlaces)
         }
 

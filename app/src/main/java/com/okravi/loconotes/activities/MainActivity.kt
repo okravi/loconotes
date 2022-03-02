@@ -453,7 +453,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, View.OnClickListen
                                         bitmapsSavedCounter += 1
 
                                         if (bitmapsSavedCounter == placesWithPhotosCounter){
-                                            //testing
+
                                             placesPreloaded = true
 
                                             if (parameter == "showPlaces"){
